@@ -20,13 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="article">
-<meta property="og:title" content="&#39;函数极限部分典型例题&#39;">
+  <meta name="description" content="\(\lim\limits_{x \to 0^{+}}  \frac{(1+x)^{\frac{1}{x}}-e}{x}&#x3D;\)  \(原式&#x3D;\lim\limits_{x \to 0^{+}} \frac{e^{\frac{1}{x}\ln(x+1)}-e}{x}&#x3D;\lim\limits_{x \to 0^{+}}\frac{e(e^{\frac{1}{x}\ln(1+x)-1}-1)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="函数极限部分典型例题">
 <meta property="og:url" content="http://example.com/2024/02/03/%E5%87%BD%E6%95%B0%E6%9E%81%E9%99%90%E9%83%A8%E5%88%86%E5%85%B8%E5%9E%8B%E4%BE%8B%E9%A2%98/index.html">
 <meta property="og:site_name" content="博客日寄">
+<meta property="og:description" content="\(\lim\limits_{x \to 0^{+}}  \frac{(1+x)^{\frac{1}{x}}-e}{x}&#x3D;\)  \(原式&#x3D;\lim\limits_{x \to 0^{+}} \frac{e^{\frac{1}{x}\ln(x+1)}-e}{x}&#x3D;\lim\limits_{x \to 0^{+}}\frac{e(e^{\frac{1}{x}\ln(1+x)-1}-1)">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-02-03T15:15:52.000Z">
-<meta property="article:modified_time" content="2024-02-03T15:15:52.675Z">
+<meta property="article:modified_time" content="2024-02-06T15:47:30.396Z">
 <meta property="article:author" content="thumesn">
 <meta name="twitter:card" content="summary">
 
@@ -43,7 +45,7 @@
   };
 </script>
 
-  <title>'函数极限部分典型例题' | 博客日寄</title>
+  <title>函数极限部分典型例题 | 博客日寄</title>
   
 
 
@@ -161,7 +163,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          '函数极限部分典型例题'
+          函数极限部分典型例题
         </h1>
 
         <div class="post-meta">
@@ -173,6 +175,13 @@
 
               <time title="创建时间：2024-02-03 23:15:52" itemprop="dateCreated datePublished" datetime="2024-02-03T23:15:52+08:00">2024-02-03</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-02-06 23:47:30" itemprop="dateModified" datetime="2024-02-06T23:47:30+08:00">2024-02-06</time>
+              </span>
 
           
 
@@ -185,7 +194,79 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <blockquote>
+<p><span class="math inline">\(\lim\limits_{x \to
+0^{+}}  \frac{(1+x)^{\frac{1}{x}}-e}{x}=\)</span></p>
+</blockquote>
+<p><span class="math inline">\(原式=\lim\limits_{x \to 0^{+}}
+\frac{e^{\frac{1}{x}\ln(x+1)}-e}{x}=\lim\limits_{x \to
+0^{+}}\frac{e(e^{\frac{1}{x}\ln(1+x)-1}-1)}{x}\)</span></p>
+<p><span class="math inline">\(\lim\limits_{x \to
+0^{+}}\frac{1}{x}\ln(1+x)-1=0\)</span> 洛必达 or 泰勒</p>
+<p>由等效知 原式等价为 <span class="math inline">\(\frac{\frac{1}{x}\ln
+(1+x)}{x}\)</span></p>
+<p><span class="math inline">\(e\lim\limits_{x \to
+0^{+}}\frac{\ln(1+x)}{x^{2}}=\frac{-e}{2}\)</span></p>
+<p>注 <span class="math inline">\(f(x)=(x+1)^{\frac{1}{x}}在
+x&gt;0时性质如下\)</span> 1. <span class="math inline">\(f(x)\)</span>单调减少 2. <span class="math inline">\(\lim\limits_{x \to 0+}f(x)=e\)</span> 3. <span class="math inline">\((x+1)^{\frac{1}{x}}-e \sim -
+\frac{e}{2}x\)</span></p>
+<blockquote>
+<p>已知极限 <span class="math inline">\(\lim\limits_{x \to 0} \frac{\tan
+2x +xf(x)}{\sin x^{3}}=0,则 \lim\limits_{x \to
+0}\frac{2+f(x)}{x^{2}}\)</span></p>
+</blockquote>
+<p>法一:无穷小量代换</p>
+<p><span class="math inline">\(\lim\limits_{x \to 0} \frac{\tan 2x
++xf(x)}{\sin x^{3}}= \alpha (x)\)</span></p>
+<p><span class="math inline">\(f(x)=\frac{x^{3} \alpha(x) -\tan
+2x}{x}\)</span></p>
+<p><span class="math inline">\(带入并取值 \lim\limits_{x \to
+0}\frac{2+f(x)}{x^{2}}=\lim\limits_{x \to 0}\frac{2+\frac{x^{3}
+\alpha(x) -\tan 2x}{x}}{x^{2}}\)</span></p>
+<p>化简并带入泰勒公式 <span class="math inline">\(-\frac{8}{3}\)</span></p>
+<p>法二:泰勒展开 （法一法二差别本质是法一是代换 法二时配凑的想法）</p>
+<blockquote>
+<p>求极限 <span class="math inline">\(\lim\limits_{x \to -1}\ln x
+\ln(1-x)\)</span></p>
+</blockquote>
+<p>首先是两个都是 <span class="math inline">\(\ln\)</span>函数所以直接使用洛必达会出现问题，无法得到结果。所以我们需要进行代换。需要注意的是
+<span class="math inline">\(\ln\)</span>代换的条件。这里我们当然会选择
+<span class="math inline">\(\ln x\)</span>
+代换接下来的问题就很简单了。</p>
+<p><span class="math inline">\(\lim\limits_{x \to 1^{-}}\ln x\ln
+(1-x)=\lim\limits_{x \to 1^{-}}(x-1)\ln(1-x)=0\)</span></p>
+<blockquote>
+<p><span class="math inline">\(\lim\limits_{x \to
++\infty}[x^{2}(e^{\frac{1}{x}}-1)-x]\)</span></p>
+</blockquote>
+<p>可以直接使用泰勒公式解决问题。但是使用洛必达的时候 可以令 <span class="math inline">\(u=\frac{1}{x}\)</span>迅速解决问题出现除法方便代换。</p>
+<blockquote>
+<p>化指数时 <span class="math inline">\(\lim u^{v}=e^{lim v \ln
+u}\)</span> 此步之后可以使用等价代换。</p>
+</blockquote>
+<blockquote>
+<p><span class="math inline">\(f(x)=\lim\limits_{t \to 0}(1+\frac{\sin
+x}{x})^{\frac{x^{2}}{t}}\)</span>在 <span class="math inline">\((-\infty,+\infty) 内间断点\)</span></p>
+</blockquote>
+<p><span class="math inline">\(计算极限化简得到
+e^{x}\)</span>需要注意x不为0 所以为可去间断点</p>
+<blockquote>
+<p><span class="math inline">\(f(x)=\arcsin \sin x\)</span> 的图像</p>
+</blockquote>
+<p>显然 以 <span class="math inline">\(2 \pi\)</span>
+为周期。在主值区间内显然为x</p>
+<p><span class="math inline">\(x \in
+[\frac{\pi}{2},\frac{3}{2}\pi]\)</span> 此时 <span class="math inline">\(\pi -x\in (-
+\frac{\pi}{2},\frac{\pi}{2})\)</span></p>
+<p><span class="math inline">\(\arcsin \sin x=\arcsin (\sin(\pi-x))=\pi
+-x\)</span></p>
+<blockquote>
+<p>已知 <span class="math inline">\(I=\displaystyle \lim\limits_{x \to
+0}(\frac{\ln(1+e^{\frac{2}{x}})}{\ln(1+e^{\frac{1}{x}})}+a[x])\)</span>,求
+<span class="math inline">\(I,a\)</span></p>
+</blockquote>
+<p>需要注意的是在两端趋于0<span class="math inline">\([x]\)</span>
+显然不同 所以可知 a=0接下来简单可得 <span class="math inline">\(I\)</span>的值</p>
 
     </div>
 
