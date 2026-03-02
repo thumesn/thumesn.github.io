@@ -87,35 +87,35 @@
               <li class="waves-block waves-effect">
                   <a href="/"  >
                     <i class="icon icon-lg icon-home"></i>
-                    <span>首 页</span><i class="icon icon-lg icon-caret-left"></i>
+                    <span>首页</span><i class="icon icon-lg icon-caret-left"></i>
                   </a>
               </li>
             
               <li class="waves-block waves-effect">
                   <a href="/archives"  >
                     <i class="icon icon-lg icon-archives"></i>
-                    <span>归 档</span><i class="icon icon-lg icon-caret-left"></i>
+                    <span>归档</span><i class="icon icon-lg icon-caret-left"></i>
                   </a>
               </li>
             
               <li class="waves-block waves-effect active">
                   <a href="/categories"  >
                     <i class="icon icon-lg icon-th-list"></i>
-                    <span>分 类</span><i class="icon icon-lg icon-caret-left"></i>
+                    <span>分类</span><i class="icon icon-lg icon-caret-left"></i>
                   </a>
               </li>
             
               <li class="waves-block waves-effect">
                   <a href="/tags"  >
                     <i class="icon icon-lg icon-tags"></i>
-                    <span>标 签</span><i class="icon icon-lg icon-caret-left"></i>
+                    <span>标签</span><i class="icon icon-lg icon-caret-left"></i>
                   </a>
               </li>
             
               <li class="waves-block waves-effect">
                   <a href="/about"  >
                     <i class="icon icon-lg icon-smile-o"></i>
-                    <span>关 于</span><i class="icon icon-lg icon-caret-left"></i>
+                    <span>关于</span><i class="icon icon-lg icon-caret-left"></i>
                   </a>
               </li>
             
@@ -180,13 +180,13 @@
                     <h1 id="pagetitle" class="archivestitle"></h1>
                     <script>
                         if(location.href.indexOf('about')!=-1){
-                            pagetitle.textContent = '关于我';
+                            pagetitle.textContent = '关于这个站点';
                         }else if(location.href.indexOf('tags')!=-1||location.href.indexOf('categories')!=-1){
                             var a=location.href.substring(location.href.length-5,location.href.length-1);
                             if(a==='tags'){
-                                pagetitle.textContent = '标签导航';
+                                pagetitle.textContent = '主题标签索引';
                             }else if(a==='ries'){
-                                pagetitle.textContent = '分类导航';
+                                pagetitle.textContent = '内容分类索引';
                             }
                         }
                     </script>
@@ -386,7 +386,7 @@ postshow();
         id: "mymotto",
         duration: 100,
         effact: "easeOut",
-        content: "认真记录，持续生长。"
+        content: "把复杂问题讲清楚。"
     });
 
 
