@@ -190,10 +190,11 @@
 <div class="container body-wrap">
     <section class="topic-tabs-wrap fade" id="topic-tabs-wrap">
         <div class="topic-tabs" role="tablist" aria-label="首页内容方向">
-            <button class="topic-tab active" type="button" role="tab" aria-selected="true" data-tab="paper">论文</button>
-            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="knowledge">知识</button>
-            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="project">项目</button>
+            <button class="topic-tab active" type="button" role="tab" aria-selected="true" data-tab="paper" onclick="switchTopicTab('paper');return false;">论文</button>
+            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="knowledge" onclick="switchTopicTab('knowledge');return false;">知识</button>
+            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="project" onclick="switchTopicTab('project');return false;">项目</button>
         </div>
+        <div class="topic-current">当前栏目：<strong id="topic-current">论文</strong></div>
         <div class="topic-panels">
             <section class="topic-panel active" data-panel="paper">
                 <h3>关于论文</h3>
@@ -430,30 +431,40 @@ postshow();
 
 	var tabs = tabsWrap.querySelectorAll(".topic-tab");
 	var panels = tabsWrap.querySelectorAll(".topic-panel");
+	var currentLabel = document.getElementById("topic-current");
 	var validTabs = ["paper", "knowledge", "project"];
+	var tabNames = {
+		paper: "论文",
+		knowledge: "知识",
+		project: "项目"
+	};
 
 	function activateTab(name) {
-		tabs.forEach(function (tab) {
+		var i = 0;
+		for (i = 0; i < tabs.length; i++) {
+			var tab = tabs[i];
 			var active = tab.getAttribute("data-tab") === name;
 			tab.classList.toggle("active", active);
 			tab.setAttribute("aria-selected", active ? "true" : "false");
-		});
-
-		panels.forEach(function (panel) {
+		}
+		for (i = 0; i < panels.length; i++) {
+			var panel = panels[i];
 			panel.classList.toggle("active", panel.getAttribute("data-panel") === name);
-		});
+		}
+		if (currentLabel && tabNames[name]) {
+			currentLabel.textContent = tabNames[name];
+		}
 	}
 
-	tabs.forEach(function (tab) {
-		tab.addEventListener("click", function () {
-			var tabName = tab.getAttribute("data-tab");
-			activateTab(tabName);
+	window.switchTopicTab = function (tabName) {
+		activateTab(tabName);
+		try {
 			history.replaceState(null, "", "#tab-" + tabName);
-		});
-	});
+		} catch (e) {}
+	};
 
 	var hashTab = location.hash.replace("#tab-", "");
-	activateTab(validTabs.indexOf(hashTab) > -1 ? hashTab : "paper");
+	window.switchTopicTab(validTabs.indexOf(hashTab) > -1 ? hashTab : "paper");
 })();
 
 

@@ -6098,6 +6098,17 @@ body {
   position: relative;
 }
 
+.topic-current {
+  margin: 0 0 8px;
+  color: #597092;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+.topic-current strong {
+  color: #1e4f91;
+}
+
 .topic-panel {
   display: none;
   border-radius: 14px;
@@ -6151,6 +6162,10 @@ body {
 @media screen and (max-width: 760px) {
   .topic-tab {
     padding: 8px 13px;
+  }
+
+  .topic-current {
+    margin-bottom: 6px;
   }
 
   .topic-panel {
