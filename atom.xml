@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <author>
+    <name>thumesn</name>
+  </author>
+  <generator uri="https://hexo.io/">Hexo</generator>
+  <id>https://thumesn.github.io/</id>
+  <link href="https://thumesn.github.io/" rel="alternate"/>
+  <link href="https://thumesn.github.io/atom.xml" rel="self"/>
+  <rights>All rights reserved 2026, thumesn</rights>
+  <subtitle>记录学习、笔记与生活。</subtitle>
+  <title>博客日寄</title>
+  <updated>2026-03-02T11:24:14.038Z</updated>
+  <entry>
+    <author>
+      <name>thumesn</name>
+    </author>
+    <category term="站点" scheme="https://thumesn.github.io/categories/%E7%AB%99%E7%82%B9/"/>
+    <category term="折腾记录" scheme="https://thumesn.github.io/categories/%E7%AB%99%E7%82%B9/%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/"/>
+    <category term="Hexo" scheme="https://thumesn.github.io/tags/Hexo/"/>
+    <category term="Theme" scheme="https://thumesn.github.io/tags/Theme/"/>
+    <category term="Tomotoes" scheme="https://thumesn.github.io/tags/Tomotoes/"/>
+    <content>
+      <![CDATA[<p>这篇文章是博客主题切换后的第一篇记录。</p><h2 id="本次调整"><a href="#本次调整" class="headerlink" title="本次调整"></a>本次调整</h2><ul><li>将博客前端切换为 <code>hexo-theme-tomotoes</code></li><li>完成 Hexo 7 兼容处理</li><li>调整站点信息、菜单与页面结构</li></ul><h2 id="历史文章"><a href="#历史文章" class="headerlink" title="历史文章"></a>历史文章</h2><p>旧版本生成的文章链接仍然保留，可从以下入口查看：</p><ul><li><a href="/2024/">旧文章目录</a></li><li><a href="/archives/">归档页</a></li></ul><p>后续会逐步把历史内容整理到新的 Hexo 源码结构中。</p>]]>
+    </content>
+    <id>https://thumesn.github.io/2026/03/02/hello-world/</id>
+    <link href="https://thumesn.github.io/2026/03/02/hello-world/"/>
+    <published>2026-03-02T11:35:00.000Z</published>
+    <summary>
+      <![CDATA[<p>这篇文章是博客主题切换后的第一篇记录。</p>
+<h2 id="本次调整"><a href="#本次调整" class="headerlink" title="本次调整"></a>本次调整</h2><ul>
+<li>将博客前端切换为 <code>hexo-theme-tom]]>
+    </summary>
+    <title>博客迁移到 Tomotoes 主题</title>
+    <updated>2026-03-02T11:24:14.038Z</updated>
+  </entry>
+</feed>
