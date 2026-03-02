@@ -118,29 +118,56 @@
 				header.classList.remove('fixed')
 			}
 		},
-		toc: (function() {
-			const toc = $('#post-toc')
-			if (!toc || !toc.children.length) {
-				if (isPost) {
-					main.classList.add('show')
+			toc: (function() {
+				const toc = $('#post-toc')
+				if (!toc || !toc.children.length) {
+					if (isPost) {
+						main.classList.add('show')
 				}
 
 				return {
 					fixed: noop,
 					actived: noop
 				}
-			}
-			const bannerH = $('.post-header').clientHeight,
-				headerH = header.clientHeight,
-				titles = $('#post-content').querySelectorAll('h1, h2, h3, h4, h5, h6')
-			toc
-				.querySelector(`a[href="#${titles[0].id}"]`)
-				.parentNode.classList.add('active')
+				}
+				const bannerH = $('.post-header').clientHeight,
+					headerH = header.clientHeight,
+					titles = $('#post-content').querySelectorAll('h1, h2, h3, h4, h5, h6')
+				if (!titles || !titles.length) {
+					if (isPost) {
+						main.classList.add('show')
+					}
 
-			main.classList.add('tocshow')
+					return {
+						fixed: noop,
+						actived: noop
+					}
+				}
+				const activateHeading = function(heading) {
+					if (!heading || !heading.id) return false
+					const link = toc.querySelector(`a[href="#${heading.id}"]`)
+					if (!link || !link.parentNode) return false
+					const current = toc.querySelector('li.active')
+					if (current) current.classList.remove('active')
+					link.parentNode.classList.add('active')
+					return true
+				}
+				if (!activateHeading(titles[0])) {
+					if (isPost) {
+						main.classList.add('show')
+					}
 
-			title.classList.add('toc')
-			$('.footer').classList.add('toc')
+					return {
+						fixed: noop,
+						actived: noop
+					}
+				}
+
+				main.classList.add('tocshow')
+
+				if (title) title.classList.add('toc')
+				const footer = $('.footer')
+				if (footer) footer.classList.add('toc')
 
 			return {
 				fixed: function(top) {
@@ -150,24 +177,18 @@
 						toc.classList.remove('fixed')
 					}
 				},
-				actived: function(top) {
-					for (let i = 0, len = titles.length; i < len; i++) {
-						if (top > offset(titles[i]).y - headerH - 5) {
-							toc.querySelector('li.active').classList.remove('active')
-							const active = toc.querySelector(`a[href="#${titles[i].id}"]`)
-								.parentNode
-							active.classList.add('active')
+					actived: function(top) {
+						for (let i = 0, len = titles.length; i < len; i++) {
+							if (top > offset(titles[i]).y - headerH - 5) {
+								activateHeading(titles[i])
+							}
+						}
+						if (top < offset(titles[0]).y) {
+							activateHeading(titles[0])
 						}
 					}
-					if (top < offset(titles[0]).y) {
-						toc.querySelector('li.active').classList.remove('active')
-						toc
-							.querySelector(`a[href="#${titles[0].id}"]`)
-							.parentNode.classList.add('active')
-					}
 				}
-			}
-		}()),
+			}()),
 		hideOnMask: [],
 		modal: function(target) {
 			this.$modal = $(target)
@@ -287,10 +308,12 @@
 					}
 				})
 			}
-		},
-		tabBar: function(el) {
-			el.parentNode.parentNode.classList.toggle('expand')
-		},
+			},
+			tabBar: function(el) {
+				if (el && el.parentNode && el.parentNode.parentNode) {
+					el.parentNode.parentNode.classList.toggle('expand')
+				}
+			},
 		page: (function() {
 			const $elements = $$('.fade, .fade-scale')
 			let visible = false
