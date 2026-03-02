@@ -6053,90 +6053,107 @@ body {
   }
 }
 
-.focus-portal {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin: 0 0 20px;
+.topic-tabs-wrap {
+  margin: 0 0 18px;
 }
 
-.focus-card {
-  display: block;
-  text-decoration: none;
-  border-radius: 16px;
-  padding: 16px 16px 14px;
-  border: 1px solid rgba(108, 137, 182, 0.28);
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 10px 24px rgba(29, 55, 97, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+.topic-tabs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.focus-card h3 {
-  margin: 0 0 8px;
-  color: #213751;
-  letter-spacing: 0.5px;
-}
-
-.focus-card p {
-  margin: 0;
-  line-height: 1.68;
-  color: #536885;
+.topic-tab {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(116, 143, 188, 0.38);
+  background: rgba(255, 255, 255, 0.82);
+  color: #405a80;
+  border-radius: 999px;
+  line-height: 1;
+  padding: 10px 16px;
   font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: all 0.22s ease;
 }
 
-.focus-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(93, 131, 191, 0.45);
-  box-shadow: 0 16px 32px rgba(29, 55, 97, 0.13);
+.topic-tab:hover {
+  transform: translateY(-1px);
+  border-color: rgba(94, 132, 195, 0.52);
+  box-shadow: 0 8px 18px rgba(29, 55, 97, 0.1);
 }
 
-.focus-card.paper {
-  background-image: linear-gradient(150deg, rgba(95, 157, 220, 0.14), rgba(255, 255, 255, 0.9) 45%);
+.topic-tab.active {
+  color: #fff;
+  border-color: rgba(45, 101, 181, 0.9);
+  background-image: linear-gradient(115deg, #316ec8 0%, #4f8fd9 100%);
+  box-shadow: 0 10px 20px rgba(31, 79, 151, 0.26);
 }
 
-.focus-card.knowledge {
-  background-image: linear-gradient(150deg, rgba(92, 202, 191, 0.14), rgba(255, 255, 255, 0.9) 45%);
+.topic-panels {
+  position: relative;
 }
 
-.focus-card.project {
-  background-image: linear-gradient(150deg, rgba(118, 142, 224, 0.14), rgba(255, 255, 255, 0.9) 45%);
-}
-
-.focus-zone {
-  scroll-margin-top: 80px;
-  margin: 0 0 12px;
+.topic-panel {
+  display: none;
   border-radius: 14px;
   border: 1px solid rgba(118, 145, 188, 0.25);
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 8px 22px rgba(29, 55, 97, 0.07);
-  padding: 14px 18px;
+  padding: 16px 18px;
 }
 
-.focus-zone h3 {
+.topic-panel.active {
+  display: block;
+  animation: topicFade 0.26s ease;
+}
+
+.topic-panel h3 {
   margin: 0 0 6px;
   color: #1f3450;
   letter-spacing: 0.4px;
 }
 
-.focus-zone p {
+.topic-panel p {
   margin: 0;
   color: #556b89;
   line-height: 1.72;
 }
 
-@media screen and (max-width: 1040px) {
-  .focus-portal {
-    grid-template-columns: 1fr;
+.topic-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #1c5ba7;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.topic-link:hover {
+  color: #0e4b96;
+  text-decoration: underline;
+}
+
+@keyframes topicFade {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @media screen and (max-width: 760px) {
-  .focus-card {
-    border-radius: 12px;
-    padding: 13px 14px 12px;
+  .topic-tab {
+    padding: 8px 13px;
   }
 
-  .focus-zone {
+  .topic-panel {
     border-radius: 12px;
     padding: 12px 14px;
   }

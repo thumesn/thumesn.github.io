@@ -188,34 +188,29 @@
 </header>
 
 <div class="container body-wrap">
-    <section class="focus-portal fade">
-        <a class="focus-card paper" href="#paper-zone">
-            <h3>关于论文</h3>
-            <p>整理论文阅读、方法拆解与复现笔记。</p>
-        </a>
-        <a class="focus-card knowledge" href="#knowledge-zone">
-            <h3>关于知识</h3>
-            <p>沉淀基础概念、公式推导和系统化学习记录。</p>
-        </a>
-        <a class="focus-card project" href="#project-zone">
-            <h3>关于项目</h3>
-            <p>记录工程实践、踩坑排查与版本迭代过程。</p>
-        </a>
-    </section>
-
-    <section id="paper-zone" class="focus-zone fade">
-        <h3>关于论文</h3>
-        <p>该部分聚焦论文阅读与实践，目标是把“看懂”转化为“可复现、可解释、可迁移”。</p>
-    </section>
-
-    <section id="knowledge-zone" class="focus-zone fade">
-        <h3>关于知识</h3>
-        <p>该部分聚焦知识体系建设，将数学、编程基础与常用方法做结构化归档。</p>
-    </section>
-
-    <section id="project-zone" class="focus-zone fade">
-        <h3>关于项目</h3>
-        <p>该部分聚焦项目实战，记录从需求拆解、实现到维护优化的完整过程。</p>
+    <section class="topic-tabs-wrap fade" id="topic-tabs-wrap">
+        <div class="topic-tabs" role="tablist" aria-label="首页内容方向">
+            <button class="topic-tab active" type="button" role="tab" aria-selected="true" data-tab="paper">论文</button>
+            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="knowledge">知识</button>
+            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="project">项目</button>
+        </div>
+        <div class="topic-panels">
+            <section class="topic-panel active" data-panel="paper">
+                <h3>关于论文</h3>
+                <p>整理阅读摘要、方法拆解、实验复现与对比结论，把“看懂”变成“可落地”。</p>
+                <a href="/tags/" class="topic-link">查看论文相关标签</a>
+            </section>
+            <section class="topic-panel" data-panel="knowledge">
+                <h3>关于知识</h3>
+                <p>沉淀数学与编程基础、关键概念与知识地图，逐步搭建长期可复用的学习体系。</p>
+                <a href="/categories/" class="topic-link">查看知识分类目录</a>
+            </section>
+            <section class="topic-panel" data-panel="project">
+                <h3>关于项目</h3>
+                <p>记录项目从需求拆解、实现到维护优化的完整链路，重点保留可复用的工程经验。</p>
+                <a href="/archives/" class="topic-link">查看项目实践归档</a>
+            </section>
+        </div>
     </section>
 
     <ul class="post-list">
@@ -427,6 +422,39 @@ postshow();
         effact: "easeOut",
         content: "把复杂问题讲清楚。"
     });
+
+/* 首页方向标签切换 */
+(function () {
+	var tabsWrap = document.getElementById("topic-tabs-wrap");
+	if (!tabsWrap) return;
+
+	var tabs = tabsWrap.querySelectorAll(".topic-tab");
+	var panels = tabsWrap.querySelectorAll(".topic-panel");
+	var validTabs = ["paper", "knowledge", "project"];
+
+	function activateTab(name) {
+		tabs.forEach(function (tab) {
+			var active = tab.getAttribute("data-tab") === name;
+			tab.classList.toggle("active", active);
+			tab.setAttribute("aria-selected", active ? "true" : "false");
+		});
+
+		panels.forEach(function (panel) {
+			panel.classList.toggle("active", panel.getAttribute("data-panel") === name);
+		});
+	}
+
+	tabs.forEach(function (tab) {
+		tab.addEventListener("click", function () {
+			var tabName = tab.getAttribute("data-tab");
+			activateTab(tabName);
+			history.replaceState(null, "", "#tab-" + tabName);
+		});
+	});
+
+	var hashTab = location.hash.replace("#tab-", "");
+	activateTab(validTabs.indexOf(hashTab) > -1 ? hashTab : "paper");
+})();
 
 
 
