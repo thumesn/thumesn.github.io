@@ -3505,19 +3505,37 @@ pre .javascript .function {
   list-style: none;
 }
 .post-list .post-title a {
-  word-break: break-word;
-  letter-spacing: 0.2px;
-  font-size: 1.55rem;
-  color: #253246;
-  font-weight: 650;
+  word-break: break-all;
+  letter-spacing: 2px;
+  font-size: 120%;
+  color: #333;
+  font-weight: 300;
   text-decoration: none;
-  -webkit-transition: color 0.25s ease;
-  transition: color 0.25s ease;
-  text-shadow: none;
-  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+  text-shadow: #452d2d 0px 0px 1px, #fffffb 0px 0px 1px, #fffffb 0px 0px 2px;
+  font-family: "STKaiti", "KaiTi", "Kaiti SC", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
 }
 .post-list .post-title a:hover {
-  color: #1f4f94;
+  color: #fff;
+  -webkit-animation: jumpWhite 1.5s ease-in-out infinite alternate;
+  animation: jumpWhite 1.5s ease-in-out infinite alternate;
+}
+@-webkit-keyframes jumpWhite {
+  from {
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #333, 0 0 8px #333, 0 0 9px #333, 0 0 10px #333, 0 0 15px #333;
+  }
+  to {
+    text-shadow: 0 0 0.5px #fff, 0 0 1px #fff, 0 0 1.5px #fff, 0 0 2px #333, 0 0 4px #333, 0 0 5px #333, 0 0 6px #333, 0 0 8px #333;
+  }
+}
+@keyframes jumpWhite {
+  from {
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #333, 0 0 8px #333, 0 0 9px #333, 0 0 10px #333, 0 0 15px #333;
+  }
+  to {
+    text-shadow: 0 0 0.5px #fff, 0 0 1px #fff, 0 0 1.5px #fff, 0 0 2px #333, 0 0 4px #333, 0 0 5px #333, 0 0 6px #333, 0 0 8px #333;
+  }
 }
 .post-list-item {
   padding: 0;
@@ -3541,7 +3559,7 @@ pre .javascript .function {
   padding: 24px 28px 6px;
 }
 .post-title {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
 }
 .post-meta {
   color: #69788f;
@@ -3682,8 +3700,8 @@ pre .javascript .function {
     line-height: 1.35;
   }
   .post-title a {
-    letter-spacing: 0;
-    font-size: 1.15rem;
+    letter-spacing: 1px;
+    font-size: 110%;
     font-family: inherit;
   }
   .post-more {
@@ -4799,12 +4817,12 @@ pre .javascript .function {
   margin-left: 0;
 }
 .archive-article .post-title {
-  word-break: break-word;
+  word-break: break-all;
   margin-left: 0;
-  font-size: 1.08rem;
-  letter-spacing: 0.2px;
-  text-shadow: none;
-  color: #202c40;
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-shadow: #9e9e9e 0px 0px 1px;
+  color: #000;
 }
 .archive-article .post-title a {
   text-decoration: none;
@@ -4818,7 +4836,7 @@ pre .javascript .function {
   height: 2px;
   bottom: 0;
   left: 0;
-  background-color: #224c8f;
+  background-color: #000;
   visibility: hidden;
   -webkit-transform: scaleX(0);
   transform: scaleX(0);
@@ -4860,7 +4878,7 @@ pre .javascript .function {
     box-shadow: 0 10px 20px rgba(36, 58, 92, 0.1);
   }
   .archive-article:hover .post-title {
-    letter-spacing: 0;
+    letter-spacing: 1px;
   }
   .archive-article:hover .archive-article-date {
     left: 0;
@@ -4876,8 +4894,8 @@ pre .javascript .function {
   .archive-article .post-title {
     margin-left: 0;
     padding-left: 0;
-    font-size: 1rem;
-    letter-spacing: 0;
+    font-size: 19px;
+    letter-spacing: 1px;
     display: block;
   }
   .archive-article .archive-article-date {
