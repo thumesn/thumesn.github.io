@@ -3212,7 +3212,7 @@ hr,
   z-index: 30;
 }
 .top-header.fixed {
-  background-image: linear-gradient(90deg, #2f6dce 0%, #5aa2ff 100%);
+  background-image: linear-gradient(90deg, #26364d 0%, #334964 100%);
   -webkit-box-shadow: 0 12px 30px rgba(26, 43, 70, 0.1), 0 4px 12px rgba(26, 43, 70, 0.06);
   box-shadow: 0 12px 30px rgba(26, 43, 70, 0.1), 0 4px 12px rgba(26, 43, 70, 0.06);
 }
@@ -3251,28 +3251,31 @@ hr,
   -webkit-transition-duration: 0.05s;
   transition-duration: 0.05s;
   -moz-tranform: translateZ(0);
-  color: #f7fbff;
-  text-shadow: 0 2px 10px rgba(36, 69, 124, 0.22);
+  color: #1f2b3b;
+  text-shadow: none;
 }
 .content-header {
   min-height: 220px;
   margin-left: -240px;
   padding: 20px 16px 5px 256px;
-  text-shadow: 0 1px 2px rgba(34, 56, 100, 0.18);
-  background-image: linear-gradient(180deg, #f2f7ff 0%, #a8c9ff 100%);
+  text-shadow: none;
+  background-image: linear-gradient(180deg, #f7f8fa 0%, #eceff3 100%);
   text-align: center;
-  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", -apple-system, sans-serif;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "PingFang SC", "Microsoft YaHei", serif;
 }
 .content-header .subtitle {
-  letter-spacing: 1.2px;
+  letter-spacing: 0.6px;
   padding-top: 42px;
-  font-size: 28px;
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 400;
+  color: #3a4656;
 }
 .content-header .title {
-  font-size: 54px;
+  font-size: 50px;
   padding-top: 20px;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: #1f2b3b;
 }
 .post-header .title,
 .post-header .subtitle {
@@ -3287,6 +3290,7 @@ hr,
 .archivestitle {
   letter-spacing: 2px;
   font-size: 42px;
+  color: #2a3648;
 }
 @media screen and (max-width: 1240px) {
   .header-title {
@@ -3309,8 +3313,9 @@ hr,
   }
   .content-header .subtitle {
     letter-spacing: 0.6px;
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.45;
+    color: #445366;
   }
   .post-header .title {
     display: block;
@@ -3514,7 +3519,7 @@ pre .javascript .function {
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
   text-shadow: #452d2d 0px 0px 1px, #fffffb 0px 0px 1px, #fffffb 0px 0px 2px;
-  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", -apple-system, sans-serif;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "PingFang SC", "Microsoft YaHei", serif;
 }
 .post-list .post-title a:hover {
   color: #fff;
@@ -5404,7 +5409,7 @@ pre .javascript .function {
     width: 100%;
     height: 100%;
     padding: 0 16px 0 56px;
-    background-image: linear-gradient(90deg, #2f6dce 0%, #5aa2ff 100%);
+    background-image: linear-gradient(90deg, #26364d 0%, #334964 100%);
   }
   .search-wrap.in .search-input {
     width: 100%;
