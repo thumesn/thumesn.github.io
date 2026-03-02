@@ -3261,7 +3261,7 @@ hr,
   text-shadow: 0 1px 2px rgba(34, 56, 100, 0.18);
   background-image: linear-gradient(180deg, #f2f7ff 0%, #a8c9ff 100%);
   text-align: center;
-  font-family: "STKaiti", "KaiTi", "Kaiti SC", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", -apple-system, sans-serif;
 }
 .content-header .subtitle {
   letter-spacing: 1.2px;
@@ -3514,7 +3514,7 @@ pre .javascript .function {
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
   text-shadow: #452d2d 0px 0px 1px, #fffffb 0px 0px 1px, #fffffb 0px 0px 2px;
-  font-family: "STKaiti", "KaiTi", "Kaiti SC", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", -apple-system, sans-serif;
 }
 .post-list .post-title a:hover {
   color: #fff;
