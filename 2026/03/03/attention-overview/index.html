@@ -47,7 +47,7 @@
 <meta property="og:description" content="这篇文章作为 Attention 系列总览，目标是用一条主线串起常见机制：基础计算、头部变体、位置编码、缓存与工程加速。 1. 注意力在算什么自注意力的核心是让每个 token 根据上下文动态聚合信息。标准形式是 Scaled Dot-Product Attention,原始论文来自《Attention Is All You Need》（Vaswani et al., 2017）  先把输入投影到">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-03T15:00:00.000Z">
-<meta property="article:modified_time" content="2026-03-03T11:58:15.459Z">
+<meta property="article:modified_time" content="2026-03-03T12:01:33.169Z">
 <meta property="article:author" content="thumesn">
 <meta property="article:tag" content="Attention">
 <meta property="article:tag" content="Transformer">
@@ -194,7 +194,7 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-%E6%B3%A8%E6%84%8F%E5%8A%9B%E5%9C%A8%E7%AE%97%E4%BB%80%E4%B9%88"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. 注意力在算什么</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B3%A8%E6%84%8F%E5%8A%9B%EF%BC%9F"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">什么是注意力？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%AC%E5%BC%8F"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">公式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">什么是自注意力</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-%E4%BB%8E%E5%8D%95%E5%A4%B4%E5%88%B0%E5%A4%9A%E5%A4%B4%EF%BC%9AMHA"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 从单头到多头：MHA</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-%E5%A4%B4%E9%83%A8%E5%8F%98%E4%BD%93%EF%BC%9AMQA-%E4%B8%8E-GQA"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 头部变体：MQA 与 GQA</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%B8%B8%E7%94%A8-RoPE"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. 位置编码：为什么常用 RoPE</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82%EF%BC%9AQKV-Bias"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. 实现细节：QKV Bias</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-%E6%8E%A8%E7%90%86%E4%BE%A7%E9%87%8D%E7%82%B9%EF%BC%9AKV-Cache"><span class="post-toc-number">6.</span> <span class="post-toc-text">6. 推理侧重点：KV Cache</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#7-%E5%B7%A5%E7%A8%8B%E5%8A%A0%E9%80%9F%EF%BC%9AFlashAttention%EF%BC%88%E6%A6%82%E5%BF%B5%EF%BC%89"><span class="post-toc-number">7.</span> <span class="post-toc-text">7. 工程加速：FlashAttention（概念）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#8-%E6%80%8E%E4%B9%88%E8%AF%BB-Attention-%E7%9B%B8%E5%85%B3%E8%AE%BA%E6%96%87"><span class="post-toc-number">8.</span> <span class="post-toc-text">8. 怎么读 Attention 相关论文</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="post-toc-number">9.</span> <span class="post-toc-text">小结</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-%E6%B3%A8%E6%84%8F%E5%8A%9B%E5%9C%A8%E7%AE%97%E4%BB%80%E4%B9%88"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. 注意力在算什么</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B3%A8%E6%84%8F%E5%8A%9B%EF%BC%9F"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">什么是注意力？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%AC%E5%BC%8F"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">公式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">什么是自注意力</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-%E4%BB%8E%E5%8D%95%E5%A4%B4%E5%88%B0%E5%A4%9A%E5%A4%B4%EF%BC%9AMHA"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 从单头到多头：MHA</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MHA-%E6%9C%89%E5%A4%9A%E8%B4%B9%E6%98%BE%E5%AD%98%EF%BC%9F"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">MHA 有多费显存？</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-%E5%A4%B4%E9%83%A8%E5%8F%98%E4%BD%93%EF%BC%9AMQA-%E4%B8%8E-GQA"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 头部变体：MQA 与 GQA</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%B8%B8%E7%94%A8-RoPE"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. 位置编码：为什么常用 RoPE</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82%EF%BC%9AQKV-Bias"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. 实现细节：QKV Bias</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-%E6%8E%A8%E7%90%86%E4%BE%A7%E9%87%8D%E7%82%B9%EF%BC%9AKV-Cache"><span class="post-toc-number">6.</span> <span class="post-toc-text">6. 推理侧重点：KV Cache</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#7-%E5%B7%A5%E7%A8%8B%E5%8A%A0%E9%80%9F%EF%BC%9AFlashAttention%EF%BC%88%E6%A6%82%E5%BF%B5%EF%BC%89"><span class="post-toc-number">7.</span> <span class="post-toc-text">7. 工程加速：FlashAttention（概念）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#8-%E6%80%8E%E4%B9%88%E8%AF%BB-Attention-%E7%9B%B8%E5%85%B3%E8%AE%BA%E6%96%87"><span class="post-toc-number">8.</span> <span class="post-toc-text">8. 怎么读 Attention 相关论文</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="post-toc-number">9.</span> <span class="post-toc-text">小结</span></a></li></ol>
         </nav>
     </aside>
    
@@ -224,7 +224,7 @@
         </div>
         <div class="post-count-custom">
             <i class="icon icon-lg icon-comment-o"></i>
-            阅读本文可能花费您&nbsp;<span class="post-count">8</span>&nbsp;分钟
+            阅读本文可能花费您&nbsp;<span class="post-count">10</span>&nbsp;分钟
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             <p>这篇文章作为 Attention 系列总览，目标是用一条主线串起常见机制：基础计算、头部变体、位置编码、缓存与工程加速。</p>
@@ -288,7 +288,32 @@
 </li>
 </ul>
 <h2 id="2-从单头到多头：MHA"><a href="#2-从单头到多头：MHA" class="headerlink" title="2. 从单头到多头：MHA"></a>2. 从单头到多头：MHA</h2><p>Multi-Head Attention（MHA）把注意力分成多个头并行计算。简单来说，我们会认为每一个词有多个“视角”来关注其他词的信息，每个头负责一个视角。这样可以让模型捕捉到更多样化的关系。</p>
-<p>代价也很直接：头越多，计算与显存开销越大，推理阶段 KV Cache 压力更明显。</p>
+<p>如何实现 MHA：</p>
+<ul>
+<li>将输入序列通过不同的线性层生成多个 Q、K、V 组，例如：<ul>
+<li>$Q^1 &#x3D; X W^{Q_1}$, $K^1 &#x3D; X W^{K_1}$, $V^1 &#x3D; X W^{V_1}$</li>
+<li>$Q^2 &#x3D; X W^{Q_2}$, $K^2 &#x3D; X W^{K_2}$, $V^2 &#x3D; X W^{V_2}$</li>
+<li>…</li>
+</ul>
+</li>
+<li>每个头独立计算注意力，例如：<ul>
+<li>$Attention^1 &#x3D; \text{Attention}(Q^1, K^1, V^1)$</li>
+<li>$Attention^2 &#x3D; \text{Attention}(Q^2, K^2, V^2)$</li>
+<li>…</li>
+</ul>
+</li>
+<li>最后将所有头的输出拼接起来并通过线性层得到最终输出，例如：</li>
+<li>$Output &#x3D; \text{Concat}(Attention^1, Attention^2, …)) W^O$ </li>
+<li>各自的shape:<ul>
+<li>Attention^i: (seq_len, d_v)</li>
+<li>Concat(Attention^1, Attention^2, …): (seq_len, num_heads * d_v)</li>
+<li>Output: (seq_len, d_model)<br>所以有 $d_model &#x3D; num_heads * d_v$。</li>
+</ul>
+</li>
+</ul>
+<h3 id="MHA-有多费显存？"><a href="#MHA-有多费显存？" class="headerlink" title="MHA 有多费显存？"></a>MHA 有多费显存？</h3><p>假如输入序列长度为 $L$，模型维度为 $d_{model}$，每个头的维度为 $d_k$，头数为 $h$，则 MHA 的显存复杂度大致为：<br>$$O(h \cdot L^2 \cdot d_k)<br>$$<br>其中 $L^2$ 来自于计算相关性分数的矩阵乘法，$h$ 来自于头数，$d_k$ 来自于每个头的维度。对于长上下文，$L^2$ 的增长会导致显存需求急剧增加，这也是为什么在长上下文场景下 MHA 会成为瓶颈的原因。</p>
+<p>比起单头注意力，MHA 的显存需求增加了 $h$ 倍，因为每个头都需要独立计算相关性分数和加权求和。此外，MHA 还需要额外的线性层来生成多个 Q、K、V 组，这也会增加显存需求。</p>
+<p>单头注意力的显存复杂度为 $O(L^2 \cdot d_k)$，而 MHA 的显存复杂度为 $O(h \cdot L^2 \cdot d_k)$，因此 MHA 的显存需求是单头注意力的 $h$ 倍。</p>
 <h2 id="3-头部变体：MQA-与-GQA"><a href="#3-头部变体：MQA-与-GQA" class="headerlink" title="3. 头部变体：MQA 与 GQA"></a>3. 头部变体：MQA 与 GQA</h2><p>为降低推理成本，常见两种变体：</p>
 <ol>
 <li>MQA：所有 Query 头共享同一组 Key&#x2F;Value，极省 KV 开销。</li>
@@ -331,7 +356,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新：<time datetime="2026-03-03T11:58:15.459Z" itemprop="dateUpdated">2026-03-03 19:58:15</time>
+    最后更新：<time datetime="2026-03-03T12:01:33.169Z" itemprop="dateUpdated">2026-03-03 20:01:33</time>
 </span>
 
 
@@ -672,7 +697,28 @@ MathJax.Hub.Queue(function() {
 });
 </script>
 
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+(function () {
+    var urls = [
+        "https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-MML-AM_CHTML",
+        "https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML",
+        "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"
+    ];
+    var idx = 0;
+    function loadNext() {
+        if (idx >= urls.length) {
+            console.error("MathJax failed to load from all configured CDNs.");
+            return;
+        }
+        var s = document.createElement("script");
+        s.src = urls[idx++];
+        s.async = true;
+        s.onerror = loadNext;
+        document.head.appendChild(s);
+    }
+    loadNext();
+})();
+</script>
 
 
 

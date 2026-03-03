@@ -275,7 +275,32 @@
 </li>
 </ul>
 <h2 id="2-从单头到多头：MHA"><a href="#2-从单头到多头：MHA" class="headerlink" title="2. 从单头到多头：MHA"></a>2. 从单头到多头：MHA</h2><p>Multi-Head Attention（MHA）把注意力分成多个头并行计算。简单来说，我们会认为每一个词有多个“视角”来关注其他词的信息，每个头负责一个视角。这样可以让模型捕捉到更多样化的关系。</p>
-<p>代价也很直接：头越多，计算与显存开销越大，推理阶段 KV Cache 压力更明显。</p>
+<p>如何实现 MHA：</p>
+<ul>
+<li>将输入序列通过不同的线性层生成多个 Q、K、V 组，例如：<ul>
+<li>$Q^1 &#x3D; X W^{Q_1}$, $K^1 &#x3D; X W^{K_1}$, $V^1 &#x3D; X W^{V_1}$</li>
+<li>$Q^2 &#x3D; X W^{Q_2}$, $K^2 &#x3D; X W^{K_2}$, $V^2 &#x3D; X W^{V_2}$</li>
+<li>…</li>
+</ul>
+</li>
+<li>每个头独立计算注意力，例如：<ul>
+<li>$Attention^1 &#x3D; \text{Attention}(Q^1, K^1, V^1)$</li>
+<li>$Attention^2 &#x3D; \text{Attention}(Q^2, K^2, V^2)$</li>
+<li>…</li>
+</ul>
+</li>
+<li>最后将所有头的输出拼接起来并通过线性层得到最终输出，例如：</li>
+<li>$Output &#x3D; \text{Concat}(Attention^1, Attention^2, …)) W^O$ </li>
+<li>各自的shape:<ul>
+<li>Attention^i: (seq_len, d_v)</li>
+<li>Concat(Attention^1, Attention^2, …): (seq_len, num_heads * d_v)</li>
+<li>Output: (seq_len, d_model)<br>所以有 $d_model &#x3D; num_heads * d_v$。</li>
+</ul>
+</li>
+</ul>
+<h3 id="MHA-有多费显存？"><a href="#MHA-有多费显存？" class="headerlink" title="MHA 有多费显存？"></a>MHA 有多费显存？</h3><p>假如输入序列长度为 $L$，模型维度为 $d_{model}$，每个头的维度为 $d_k$，头数为 $h$，则 MHA 的显存复杂度大致为：<br>$$O(h \cdot L^2 \cdot d_k)<br>$$<br>其中 $L^2$ 来自于计算相关性分数的矩阵乘法，$h$ 来自于头数，$d_k$ 来自于每个头的维度。对于长上下文，$L^2$ 的增长会导致显存需求急剧增加，这也是为什么在长上下文场景下 MHA 会成为瓶颈的原因。</p>
+<p>比起单头注意力，MHA 的显存需求增加了 $h$ 倍，因为每个头都需要独立计算相关性分数和加权求和。此外，MHA 还需要额外的线性层来生成多个 Q、K、V 组，这也会增加显存需求。</p>
+<p>单头注意力的显存复杂度为 $O(L^2 \cdot d_k)$，而 MHA 的显存复杂度为 $O(h \cdot L^2 \cdot d_k)$，因此 MHA 的显存需求是单头注意力的 $h$ 倍。</p>
 <h2 id="3-头部变体：MQA-与-GQA"><a href="#3-头部变体：MQA-与-GQA" class="headerlink" title="3. 头部变体：MQA 与 GQA"></a>3. 头部变体：MQA 与 GQA</h2><p>为降低推理成本，常见两种变体：</p>
 <ol>
 <li>MQA：所有 Query 头共享同一组 Key&#x2F;Value，极省 KV 开销。</li>
@@ -972,7 +997,28 @@ MathJax.Hub.Queue(function() {
 });
 </script>
 
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+(function () {
+    var urls = [
+        "https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-MML-AM_CHTML",
+        "https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML",
+        "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"
+    ];
+    var idx = 0;
+    function loadNext() {
+        if (idx >= urls.length) {
+            console.error("MathJax failed to load from all configured CDNs.");
+            return;
+        }
+        var s = document.createElement("script");
+        s.src = urls[idx++];
+        s.async = true;
+        s.onerror = loadNext;
+        document.head.appendChild(s);
+    }
+    loadNext();
+})();
+</script>
 
 
 

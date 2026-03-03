@@ -589,7 +589,28 @@ MathJax.Hub.Queue(function() {
 });
 </script>
 
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+(function () {
+    var urls = [
+        "https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-MML-AM_CHTML",
+        "https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML",
+        "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"
+    ];
+    var idx = 0;
+    function loadNext() {
+        if (idx >= urls.length) {
+            console.error("MathJax failed to load from all configured CDNs.");
+            return;
+        }
+        var s = document.createElement("script");
+        s.src = urls[idx++];
+        s.async = true;
+        s.onerror = loadNext;
+        document.head.appendChild(s);
+    }
+    loadNext();
+})();
+</script>
 
 
 
