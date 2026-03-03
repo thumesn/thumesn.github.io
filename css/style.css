@@ -6306,6 +6306,17 @@ body[data-topic-tone="project"] {
   text-shadow: none !important;
 }
 
+/* Post page: remove empty hero strip at top */
+.content-header.post-header {
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.content-header.post-header .container {
+  display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   #main::before,
   #main::after,
