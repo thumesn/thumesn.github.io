@@ -214,7 +214,7 @@
 
     <ul class="post-list">
     
-        <li class="post-list-item fade">
+        <li class="post-list-item fade" data-topic="paper">
             <article id="post-qwen2-5-report-reading"
   class="article-card article-type-post" itemprop="blogPost">
 
@@ -258,7 +258,7 @@
 
         </li>
     
-        <li class="post-list-item fade">
+        <li class="post-list-item fade" data-topic="project">
             <article id="post-hello-world"
   class="article-card article-type-post" itemprop="blogPost">
 
@@ -474,6 +474,7 @@ postshow();
 	var tabs = tabsWrap.querySelectorAll(".topic-tab");
 	var panels = tabsWrap.querySelectorAll(".topic-panel");
 	var glider = document.getElementById("topic-tab-glider");
+	var postItems = document.querySelectorAll(".post-list .post-list-item");
 	var validTabs = ["paper", "knowledge", "project"];
 	var tabThemeMap = {
 		paper: "paper",
@@ -502,6 +503,11 @@ postshow();
 		for (i = 0; i < panels.length; i++) {
 			var panel = panels[i];
 			panel.classList.toggle("active", panel.getAttribute("data-panel") === name);
+		}
+		for (i = 0; i < postItems.length; i++) {
+			var item = postItems[i];
+			var topic = item.getAttribute("data-topic");
+			item.classList.toggle("topic-hidden", topic !== name);
 		}
 		moveGlider(target);
 		document.body.setAttribute("data-topic-tone", tabThemeMap[name] || "paper");

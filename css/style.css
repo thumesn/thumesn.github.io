@@ -5976,6 +5976,10 @@ body[data-topic-tone="project"] {
   box-shadow: var(--tm-shadow);
 }
 
+.post-list-item.topic-hidden {
+  display: none;
+}
+
 .archive-article:hover {
   transform: translateY(-4px);
   box-shadow: var(--tm-shadow);
