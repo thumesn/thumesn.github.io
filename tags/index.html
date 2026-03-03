@@ -339,18 +339,6 @@
 </a>
 
                 
-                    <a class="MyTagLink" href="/tags/QKV-Bias/" itemprop="url">
-    <div class="card-card">
-        <div class="card-container">
-            <span href="/tags/QKV-Bias/" class="card-link">QKV Bias</span>
-            <span class="card-count">
-                (1)
-            </span>
-        </div>
-    </div>
-</a>
-
-                
                     <a class="MyTagLink" href="/tags/PPO/" itemprop="url">
     <div class="card-card">
         <div class="card-container">
@@ -367,6 +355,18 @@
     <div class="card-card">
         <div class="card-container">
             <span href="/tags/RLHF/" class="card-link">RLHF</span>
+            <span class="card-count">
+                (1)
+            </span>
+        </div>
+    </div>
+</a>
+
+                
+                    <a class="MyTagLink" href="/tags/QKV-Bias/" itemprop="url">
+    <div class="card-card">
+        <div class="card-container">
+            <span href="/tags/QKV-Bias/" class="card-link">QKV Bias</span>
             <span class="card-count">
                 (1)
             </span>
@@ -666,6 +666,31 @@ if (window.console && window.console.log) {
 
 
 <!-- 公式渲染 -->
+
+<!-- MathJax config -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" }
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 
 

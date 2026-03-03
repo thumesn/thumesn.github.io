@@ -60,9 +60,9 @@ $$
     - "eat" -> [1.0, 1.1, 1.2]
     - "apples" -> [1.3, 1.4, 1.5]
   - 通过线性变换生成 Q、K、V 向量，例如：
-    - $Q_{"I"} $ = [0.1, 0.2, 0.3] * W^Q$
-    - $K_{"I"} $ = [0.1, 0.2, 0.3] * W^K$
-    - $V_{"I"} $ = [0.1, 0.2, 0.3] * W^V$
+    - $Q_{\text{I}} = [0.1, 0.2, 0.3] W^Q$
+    - $K_{\text{I}} = [0.1, 0.2, 0.3] W^K$
+    - $V_{\text{I}} = [0.1, 0.2, 0.3] W^V$
     - 其他词同理。
     - 各自的shape:
       - Q: (seq_len, d_model) -> (seq_len, d_k)
@@ -70,10 +70,10 @@ $$
       - V: (seq_len, d_model) -> (seq_len, d_v)
     - 常见的模型的比如gpt-3.5-turbo中，d_model=4096, d_k=d_v=1024。
   - 计算相关性分数，例如：
-    - $score_{"I", "like"} = Q_{"I"} \cdot K_{"like"}^T / \sqrt{d_k}$
+    - $score_{\text{I},\text{like}} = Q_{\text{I}} \cdot K_{\text{like}}^T / \sqrt{d_k}$
     - 其他词同理。
   - 对分数做 softmax 后加权求和 V，例如：
-    - $Attention_{"I"} = \sum_{j} \text{softmax}(score_{"I", j}) \cdot V_j$
+    - $Attention_{\text{I}} = \sum_{j} \text{softmax}(score_{\text{I}, j}) \cdot V_j$
     - 其他词同理。
     - 最终如果某个词和其他词的相关性较高，那么它在输出中就会占更大的权重，从而让模型更关注这个词的信息。
 
@@ -82,8 +82,33 @@ $$
 
 Multi-Head Attention（MHA）把注意力分成多个头并行计算。简单来说，我们会认为每一个词有多个“视角”来关注其他词的信息，每个头负责一个视角。这样可以让模型捕捉到更多样化的关系。
 
-代价也很直接：头越多，计算与显存开销越大，推理阶段 KV Cache 压力更明显。
+如何实现 MHA：
+- 将输入序列通过不同的线性层生成多个 Q、K、V 组，例如：
+  - $Q^1 = X W^{Q_1}$, $K^1 = X W^{K_1}$, $V^1 = X W^{V_1}$
+  - $Q^2 = X W^{Q_2}$, $K^2 = X W^{K_2}$, $V^2 = X W^{V_2}$
+  - ...
+- 每个头独立计算注意力，例如：
+  - $Attention^1 = \text{Attention}(Q^1, K^1, V^1)$
+  - $Attention^2 = \text{Attention}(Q^2, K^2, V^2)$
+  - ...
+- 最后将所有头的输出拼接起来并通过线性层得到最终输出，例如：
+- $Output = \text{Concat}(Attention^1, Attention^2, ...)) W^O$ 
+- 各自的shape:
+  - Attention^i: (seq_len, d_v)
+  - Concat(Attention^1, Attention^2, ...): (seq_len, num_heads * d_v)
+  - Output: (seq_len, d_model)
+  所以有 $d_model = num_heads * d_v$。
 
+### MHA 有多费显存？
+
+假如输入序列长度为 $L$，模型维度为 $d_{model}$，每个头的维度为 $d_k$，头数为 $h$，则 MHA 的显存复杂度大致为：
+$$O(h \cdot L^2 \cdot d_k)
+$$
+其中 $L^2$ 来自于计算相关性分数的矩阵乘法，$h$ 来自于头数，$d_k$ 来自于每个头的维度。对于长上下文，$L^2$ 的增长会导致显存需求急剧增加，这也是为什么在长上下文场景下 MHA 会成为瓶颈的原因。
+
+比起单头注意力，MHA 的显存需求增加了 $h$ 倍，因为每个头都需要独立计算相关性分数和加权求和。此外，MHA 还需要额外的线性层来生成多个 Q、K、V 组，这也会增加显存需求。
+
+单头注意力的显存复杂度为 $O(L^2 \cdot d_k)$，而 MHA 的显存复杂度为 $O(h \cdot L^2 \cdot d_k)$，因此 MHA 的显存需求是单头注意力的 $h$ 倍。
 ## 3. 头部变体：MQA 与 GQA
 
 为降低推理成本，常见两种变体：

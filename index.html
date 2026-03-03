@@ -247,9 +247,9 @@
 </ul>
 </li>
 <li>通过线性变换生成 Q、K、V 向量，例如：<ul>
-<li>$Q_{“I”} $ &#x3D; [0.1, 0.2, 0.3] * W^Q$</li>
-<li>$K_{“I”} $ &#x3D; [0.1, 0.2, 0.3] * W^K$</li>
-<li>$V_{“I”} $ &#x3D; [0.1, 0.2, 0.3] * W^V$</li>
+<li>$Q_{\text{I}} &#x3D; [0.1, 0.2, 0.3] W^Q$</li>
+<li>$K_{\text{I}} &#x3D; [0.1, 0.2, 0.3] W^K$</li>
+<li>$V_{\text{I}} &#x3D; [0.1, 0.2, 0.3] W^V$</li>
 <li>其他词同理。</li>
 <li>各自的shape:<ul>
 <li>Q: (seq_len, d_model) -&gt; (seq_len, d_k)</li>
@@ -261,12 +261,12 @@
 </ul>
 </li>
 <li>计算相关性分数，例如：<ul>
-<li>$score_{“I”, “like”} &#x3D; Q_{“I”} \cdot K_{“like”}^T &#x2F; \sqrt{d_k}$</li>
+<li>$score_{\text{I},\text{like}} &#x3D; Q_{\text{I}} \cdot K_{\text{like}}^T &#x2F; \sqrt{d_k}$</li>
 <li>其他词同理。</li>
 </ul>
 </li>
 <li>对分数做 softmax 后加权求和 V，例如：<ul>
-<li>$Attention_{“I”} &#x3D; \sum_{j} \text{softmax}(score_{“I”, j}) \cdot V_j$</li>
+<li>$Attention_{\text{I}} &#x3D; \sum_{j} \text{softmax}(score_{\text{I}, j}) \cdot V_j$</li>
 <li>其他词同理。</li>
 <li>最终如果某个词和其他词的相关性较高，那么它在输出中就会占更大的权重，从而让模型更关注这个词的信息。</li>
 </ul>
@@ -948,6 +948,31 @@ if (window.console && window.console.log) {
 
 
 <!-- 公式渲染 -->
+
+<!-- MathJax config -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" }
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 
 
