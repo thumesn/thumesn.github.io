@@ -6,7 +6,7 @@
     
     
     
-    <title>归档: 2026/3 | thumesn 札记</title>
+    <title>标签: RLHF | thumesn 札记</title>
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
     
     <meta name="theme-color" content="#3A7AFE">
@@ -42,7 +42,7 @@
     <meta name="description" content="记录学习、笔记与生活。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="thumesn 札记">
-<meta property="og:url" content="https://thumesn.github.io/archives/2026/03/index.html">
+<meta property="og:url" content="https://thumesn.github.io/tags/RLHF/index.html">
 <meta property="og:site_name" content="thumesn 札记">
 <meta property="og:description" content="记录学习、笔记与生活。">
 <meta property="og:locale" content="zh_CN">
@@ -91,7 +91,7 @@
                   </a>
               </li>
             
-              <li class="waves-block waves-effect active">
+              <li class="waves-block waves-effect">
                   <a href="/archives"  >
                     <i class="icon icon-lg icon-archives"></i>
                     <span>归档</span><i class="icon icon-lg icon-caret-left"></i>
@@ -105,7 +105,7 @@
                   </a>
               </li>
             
-              <li class="waves-block waves-effect">
+              <li class="waves-block waves-effect active">
                   <a href="/tags"  >
                     <i class="icon icon-lg icon-tags"></i>
                     <span>标签</span><i class="icon icon-lg icon-caret-left"></i>
@@ -150,7 +150,7 @@
         <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
           <i class="icon icon-lg icon-navicon"></i>
         </a>
-        <div class="flex-col header-title ellipsis">归档</div>
+        <div class="flex-col header-title ellipsis">标签: RLHF</div>
         
         <div class="search-wrap" id="search-wrap">
             <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
@@ -167,7 +167,7 @@
         </a>
     </div>
 </header>
-<header class="content-header archives-header">
+<header class="content-header tags-header">
     
     
     <div class="container fade-scale">
@@ -177,7 +177,19 @@
             </h1>
             <h5 class="subtitle">
                 
-                    <h1 class="archivestitle">文章归档与时间线</h1>
+                    <h1 id="pagetitle" class="archivestitle"></h1>
+                    <script>
+                        if(location.href.indexOf('about')!=-1){
+                            pagetitle.textContent = '关于这个站点';
+                        }else if(location.href.indexOf('tags')!=-1||location.href.indexOf('categories')!=-1){
+                            var a=location.href.substring(location.href.length-5,location.href.length-1);
+                            if(a==='tags'){
+                                pagetitle.textContent = '主题标签索引';
+                            }else if(a==='ries'){
+                                pagetitle.textContent = '内容分类索引';
+                            }
+                        }
+                    </script>
                 
             </h5>
         </div>
@@ -185,55 +197,26 @@
 
 </header>
 
-<div class="container body-wrap fade">
-    
 
-    
+    <div class="container body-wrap fade">
+        
             
-            <h3 class="archive-separator">
-                <i class="icon icon-lg icon-folder-o"></i>&nbsp;&nbsp;
-                2026
-            </h3>
+            
+            <h5 class="tag-tip">
+                <i class="icon icon-tag"></i>
+                关于
+                <span style="color:rgb(100, 100, 100)">RLHF</span>
+                共1篇文章
+            </h5>
             <div class="waterfall">
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/attention-overview/'">
+            
+                <article class="archive-article" onclick="location.href='/2026/03/03/ppo-policy-optimization-notes/'">
     <div class="archive-article-date">
       
       <time class="my-post-time">
         <i class="icon icon-lg icon-file-text-o"></i>
         &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/attention-overview/">Attention 全览：从 MHA 到 GQA、RoPE 与工程优化</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Attention/" rel="tag">Attention</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Transformer/" rel="tag">Transformer</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/ppo-policy-optimization-notes/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
+          2026-03-03
       </time>
     </div>
     <div class="archive-article-inner">
@@ -254,256 +237,9 @@
 
     </div>
   </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/dpo-direct-preference-optimization-notes/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/dpo-direct-preference-optimization-notes/">DPO（直接偏好优化）笔记：不用奖励模型也能做偏好对齐</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DPO/" rel="tag">DPO</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Preference-Learning/" rel="tag">Preference Learning</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/sft-supervised-finetuning-notes/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/sft-supervised-finetuning-notes/">SFT（监督微调）笔记：把基础模型变成可用助手的第一步</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Alignment/" rel="tag">Alignment</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SFT/" rel="tag">SFT</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/moe-token-routing-notes/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/moe-token-routing-notes/">MoE Token 路由机制笔记：为什么能在成本内提升能力</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MoE/" rel="tag">MoE</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Token-Routing/" rel="tag">Token Routing</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/rmsnorm-notes/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/rmsnorm-notes/">RMSNorm 笔记：在大模型中为什么常替代 LayerNorm</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Normalization/" rel="tag">Normalization</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RMSNorm/" rel="tag">RMSNorm</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/qkv-bias-notes/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/qkv-bias-notes/">QKV Bias 在 Transformer 中的作用</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Attention/" rel="tag">Attention</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/QKV-Bias/" rel="tag">QKV Bias</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/rope-rotary-position-embedding/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/rope-rotary-position-embedding/">RoPE（旋转位置编码）理解与应用</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Position-Encoding/" rel="tag">Position Encoding</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RoPE/" rel="tag">RoPE</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/swiglu-activation-notes/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/swiglu-activation-notes/">SwiGLU 激活函数笔记：为什么在大模型里常见</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Activation/" rel="tag">Activation</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SwiGLU/" rel="tag">SwiGLU</a></li></ul>
-
-    </div>
-  </article>
-
-    
-
-        <article class="archive-article" onclick="location.href='/2026/03/03/gqa-grouped-query-attention/'">
-    <div class="archive-article-date">
-      
-      <time class="my-post-time">
-        <i class="icon icon-lg icon-file-text-o"></i>
-        &nbsp;
-          03-03
-      </time>
-    </div>
-    <div class="archive-article-inner">
-      
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/gqa-grouped-query-attention/">GQA（Grouped Query Attention）技术拆解</a>
-    </h3>
-  
-
-
-
-      <br/>
-      
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Attention/" rel="tag">Attention</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GQA/" rel="tag">GQA</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li></ul>
-
-    </div>
-  </article>
-
-    
-    </div>
-
-    
-<nav id="page-nav">
-    <div class="inner">
-    <span class="page-number current">1</span><a class="page-number" href="/archives/2026/03/page/2/">2</a><a class="extend next" rel="next" href="/archives/2026/03/page/2/">下一页</a>
-    </div>
-</nav>
+            
+            </div>
+        
 
 </div>
 

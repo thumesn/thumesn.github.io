@@ -63,7 +63,6 @@
 
 <body>
     <div id="loading" class="active"></div>
-    <div id="scroll-progress"></div>
     <aside id="menu"   >
   <div class="inner flex-row-vertical">
     <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
@@ -174,10 +173,14 @@
     <div class="container fade-scale">
         <div id="myheader">
             <h1 class="title">
-                <span class="hero-title-line">thumesn 札记</span>
+                 
+                    thumesn 札记
+                
             </h1>
             <h5 class="subtitle">
-                <span class="hero-subtitle-line">数学 · 编程 · 生活</span>
+                
+                    数学 · 编程 · 生活
+                
             </h5>
         </div>
     </div>
@@ -185,37 +188,10 @@
 </header>
 
 <div class="container body-wrap">
-    <section class="topic-tabs-wrap fade" id="topic-tabs-wrap">
-        <div class="topic-tabs" role="tablist" aria-label="首页内容方向">
-            <button class="topic-tab active" type="button" role="tab" aria-selected="true" data-tab="paper" onclick="switchTopicTab('paper');return false;">论文</button>
-            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="knowledge" onclick="switchTopicTab('knowledge');return false;">知识</button>
-            <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="project" onclick="switchTopicTab('project');return false;">项目</button>
-            <span class="topic-tab-glider" id="topic-tab-glider" aria-hidden="true"></span>
-        </div>
-        <div class="topic-panels">
-            <section class="topic-panel active" data-panel="paper">
-                <h3>关于论文</h3>
-                <p>整理阅读摘要、方法拆解、实验复现与对比结论，把“看懂”变成“可落地”。</p>
-                <a href="/tags/" class="topic-link">查看论文相关标签</a>
-            </section>
-            <section class="topic-panel" data-panel="knowledge">
-                <h3>关于知识</h3>
-                <p>沉淀数学与编程基础、关键概念与知识地图，逐步搭建长期可复用的学习体系。</p>
-                <a href="/categories/" class="topic-link">查看知识分类目录</a>
-            </section>
-            <section class="topic-panel" data-panel="project">
-                <h3>关于项目</h3>
-                <p class="topic-intro">这里记录我正在做和已经完成的项目：做了什么、怎么做、遇到了什么问题、最后如何解决。</p>
-                <p class="topic-motto">座右铭：把复杂问题讲清楚，把小事持续做扎实。</p>
-                <a href="/archives/" class="topic-link">查看项目实践归档</a>
-            </section>
-        </div>
-    </section>
-
     <ul class="post-list">
     
-        <li class="post-list-item fade" data-topic="paper">
-            <article id="post-qwen2-5-report-reading"
+        <li class="post-list-item fade">
+            <article id="post-attention-overview"
   class="article-card article-type-post" itemprop="blogPost">
 
     
@@ -223,7 +199,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/03/qwen2-5-report-reading/">Qwen2.5 技术报告阅读笔记</a>
+      <a href="/2026/03/03/attention-overview/">Attention 全览：从 MHA 到 GQA、RoPE 与工程优化</a>
     </h3>
   
 
@@ -231,18 +207,114 @@
 
 
      <div class="post-meta">
-        <time class="post-time" title="2026-03-03 21:00:00" datetime="2026-03-03T13:00:00.000Z"  itemprop="datePublished">2026-03-03</time>
+        <time class="post-time" title="2026-03-03 23:00:00" datetime="2026-03-03T15:00:00.000Z"  itemprop="datePublished">2026-03-03</time>
 
     </div>
 
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        <p>这篇笔记记录我对 Qwen2.5 Technical Report 的首次系统阅读，重点关注训练规模、对齐流程、实验结论和工程启发。</p>
+        <p>这篇文章作为 Attention 系列总览，目标是用一条主线串起常见机制：基础计算、头部变体、位置编码、缓存与工程加速。</p>
+<h2 id="1-注意力在算什么"><a href="#1-注意力在算什么" class="headerlink" title="1. 注意力在算什么"></a>1. 注意力在算什么</h2><p>自注意力的核心是让每个 token 根据上下文动态聚合信息。标准形式是 Scaled Dot-Product Attention,原始论文来自《Attention Is All You Need》（Vaswani et al., 2017）</p>
+<ul>
+<li>先把输入投影到 Q、K、V</li>
+<li>用 Q 和 K 算相关性分数</li>
+<li>对分数做 softmax 后加权求和 V</li>
+</ul>
+<h3 id="什么是注意力？"><a href="#什么是注意力？" class="headerlink" title="什么是注意力？"></a>什么是注意力？</h3><p>注意力机制让模型在处理输入时能够动态地关注不同部分的信息。它通过计算输入序列中各个元素之间的相关性来决定哪些信息更重要，从而提高模型的表达能力和性能。简单理解,输出中存在重要信息时，注意力机制会让模型更关注这些信息，从而更好地理解和生成文本。</p>
+<ul>
+<li>Query（查询）：表示当前 token 的查询向量，用于计算与其他 token 的相关性。举个生活化的例子，假设你在阅读一篇文章，Query 就像是你当前关注的内容或问题。</li>
+<li>Key（键）：表示输入序列中每个 token 的键向量，用于与 Query 计算相关性。Key 就像是文章中每个词的标签或特征。</li>
+<li>Value（值）：表示输入序列中每个 token 的值向量，用于根据相关性加权求和得到最终输出。Value 就像是文章中每个词的实际内容或信息。</li>
+</ul>
+<p>举个生活化的例子,Q 就是你关注的问题，比如“这篇文章的主要观点是什么？”，K 是文章中每个词的标签或特征，比如“观点”、“细节”、“例子”等，V 是文章中每个词的实际内容或信息。当你阅读文章时，你会根据你的关注点（Query）来寻找相关的信息（Key），并根据相关性来获取有用的信息（Value）。注意力机制就是在模型内部模拟这个过程，让模型能够更好地理解和生成文本。</p>
+<h3 id="公式"><a href="#公式" class="headerlink" title="公式"></a>公式</h3><p>$$<br>\text{Attention}(Q, K, V) &#x3D; \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V<br>$$</p>
+<p>其中 $d_k$ 是 Key 向量的维度，$\sqrt{d_k}$ 是缩放因子，防止相关性分数过大导致 softmax 梯度消失。</p>
+<blockquote>
+<p>为什么要缩放？<br>因为 Q 和 K 的维度通常较大，点积结果可能会有较大的值，导致 softmax 输出过于集中，梯度消失。缩放后可以保持数值稳定性。方差过大会导致 softmax 输出过于集中，模型难以学习到有效的梯度。通过除以 $\sqrt{d_k}$，可以使得点积的值保持在一个合理的范围内，从而避免梯度消失问题。<br>为什么除以 $\sqrt{d_k}$？<br>因为点积的期望值与维度成正比： 证明：假设 Q 和 K 的元素独立同分布，均值为 0，方差为 1，那么点积 $QK^T$ 的期望值为 $d_k$，因此需要除以 $\sqrt{d_k}$ 来保持数值稳定。<br>为什么不存在 某一个 Q 的值特别大，比如某一个维度上有一个值特别大？因为 Q 和 K 的元素通常是通过线性变换得到的，且在训练过程中会有正则化和梯度更新来防止某个维度的值过大。此外，缩放因子 $\sqrt{d_k}$ 也有助于缓解这个问题。<br>Q,K 是如何得到的？它们是通过输入序列的线性变换得到的。具体来说，输入序列中的每个 token 都会被映射到一个向量空间中，然后通过三个不同的线性层分别生成 Q、K 和 V 向量。这些线性层的权重是在训练过程中学习得到的，因此模型可以根据任务需求自动调整 Q、K 和 V 的表示方式.</p>
+</blockquote>
+<h3 id="什么是自注意力"><a href="#什么是自注意力" class="headerlink" title="什么是自注意力"></a>什么是自注意力</h3><p>自注意力（Self-Attention）是指在计算注意力时，Query、Key 和 Value 都来自同一个输入序列。这使得模型能够在处理每个 token 时同时考虑整个序列的信息，从而捕捉长距离依赖关系。</p>
+<p>举个例子，这样的一句话“我喜欢吃苹果，因为它很甜。”，在计算自注意力时，每个词都会与其他词进行交互。例如，它可以让模型理解“它”指代的是“苹果”，从而更好地理解句子的含义。</p>
+<ul>
+<li>从零开始计算自注意力：<ul>
+<li>输入序列 [“I”, “like”, “to”, “eat”, “apples”]</li>
+<li>tokenizer 将每个词转换为向量表示，例如：<ul>
+<li>“I” -&gt; [0.1, 0.2, 0.3]</li>
+<li>“like” -&gt; [0.4, 0.5, 0.6]</li>
+<li>“to” -&gt; [0.7, 0.8, 0.9]</li>
+<li>“eat” -&gt; [1.0, 1.1, 1.2]</li>
+<li>“apples” -&gt; [1.3, 1.4, 1.5]</li>
+</ul>
+</li>
+<li>通过线性变换生成 Q、K、V 向量，例如：<ul>
+<li>$Q_{“I”} $ &#x3D; [0.1, 0.2, 0.3] * W^Q$</li>
+<li>$K_{“I”} $ &#x3D; [0.1, 0.2, 0.3] * W^K$</li>
+<li>$V_{“I”} $ &#x3D; [0.1, 0.2, 0.3] * W^V$</li>
+<li>其他词同理。</li>
+<li>各自的shape:<ul>
+<li>Q: (seq_len, d_model) -&gt; (seq_len, d_k)</li>
+<li>K: (seq_len, d_model) -&gt; (seq_len, d_k)</li>
+<li>V: (seq_len, d_model) -&gt; (seq_len, d_v)</li>
+</ul>
+</li>
+<li>常见的模型的比如gpt-3.5-turbo中，d_model&#x3D;4096, d_k&#x3D;d_v&#x3D;1024。</li>
+</ul>
+</li>
+<li>计算相关性分数，例如：<ul>
+<li>$score_{“I”, “like”} &#x3D; Q_{“I”} \cdot K_{“like”}^T &#x2F; \sqrt{d_k}$</li>
+<li>其他词同理。</li>
+</ul>
+</li>
+<li>对分数做 softmax 后加权求和 V，例如：<ul>
+<li>$Attention_{“I”} &#x3D; \sum_{j} \text{softmax}(score_{“I”, j}) \cdot V_j$</li>
+<li>其他词同理。</li>
+<li>最终如果某个词和其他词的相关性较高，那么它在输出中就会占更大的权重，从而让模型更关注这个词的信息。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-从单头到多头：MHA"><a href="#2-从单头到多头：MHA" class="headerlink" title="2. 从单头到多头：MHA"></a>2. 从单头到多头：MHA</h2><p>Multi-Head Attention（MHA）把注意力分成多个头并行计算。简单来说，我们会认为每一个词有多个“视角”来关注其他词的信息，每个头负责一个视角。这样可以让模型捕捉到更多样化的关系。</p>
+<p>代价也很直接：头越多，计算与显存开销越大，推理阶段 KV Cache 压力更明显。</p>
+<h2 id="3-头部变体：MQA-与-GQA"><a href="#3-头部变体：MQA-与-GQA" class="headerlink" title="3. 头部变体：MQA 与 GQA"></a>3. 头部变体：MQA 与 GQA</h2><p>为降低推理成本，常见两种变体：</p>
+<ol>
+<li>MQA：所有 Query 头共享同一组 Key&#x2F;Value，极省 KV 开销。</li>
+<li>GQA：多个 Query 头共享一组 Key&#x2F;Value，在质量与成本间折中。</li>
+</ol>
+<p>详细拆解见：</p>
+<ul>
+<li><a href="/2026/03/03/gqa-grouped-query-attention/">GQA（Grouped Query Attention）技术拆解</a></li>
+</ul>
+<h2 id="4-位置编码：为什么常用-RoPE"><a href="#4-位置编码：为什么常用-RoPE" class="headerlink" title="4. 位置编码：为什么常用 RoPE"></a>4. 位置编码：为什么常用 RoPE</h2><p>注意力机制本身不感知顺序，所以需要位置编码。RoPE 通过旋转变换把位置信息注入向量，在长上下文中表现通常更稳。</p>
+<p>详细拆解见：</p>
+<ul>
+<li><a href="/2026/03/03/rope-rotary-position-embedding/">RoPE（旋转位置编码）理解与应用</a></li>
+</ul>
+<h2 id="5-实现细节：QKV-Bias"><a href="#5-实现细节：QKV-Bias" class="headerlink" title="5. 实现细节：QKV Bias"></a>5. 实现细节：QKV Bias</h2><p>QKV 线性层中的 bias 看起来很小，但会影响训练动态与收敛行为，是否启用应通过任务实验决定。</p>
+<p>详细拆解见：</p>
+<ul>
+<li><a href="/2026/03/03/qkv-bias-notes/">QKV Bias 在 Transformer 中的作用</a></li>
+</ul>
+<h2 id="6-推理侧重点：KV-Cache"><a href="#6-推理侧重点：KV-Cache" class="headerlink" title="6. 推理侧重点：KV Cache"></a>6. 推理侧重点：KV Cache</h2><p>自回归推理时，历史 token 的 K&#x2F;V 会缓存起来避免重复计算。上下文变长后，KV Cache 往往成为显存与吞吐瓶颈，这也是 MQA&#x2F;GQA 受欢迎的重要原因。</p>
+<p>评估时建议同时看：</p>
+<ul>
+<li>吞吐（tokens&#x2F;s）</li>
+<li>延迟（首 token 与平均 token）</li>
+<li>长上下文稳定性</li>
+</ul>
+<h2 id="7-工程加速：FlashAttention（概念）"><a href="#7-工程加速：FlashAttention（概念）" class="headerlink" title="7. 工程加速：FlashAttention（概念）"></a>7. 工程加速：FlashAttention（概念）</h2><p>FlashAttention 的核心价值是优化注意力计算的访存路径，减少不必要的内存读写，从而提升速度并降低显存压力。</p>
+<p>它本质是“算子工程优化”，不改变注意力机制定义，但显著改变实际运行效率。</p>
+<h2 id="8-怎么读-Attention-相关论文"><a href="#8-怎么读-Attention-相关论文" class="headerlink" title="8. 怎么读 Attention 相关论文"></a>8. 怎么读 Attention 相关论文</h2><p>我的建议是固定三问：</p>
+<ol>
+<li>这项改动改善了什么瓶颈（质量、显存、延迟、吞吐）？</li>
+<li>代价是什么（训练复杂度、部署复杂度、稳定性风险）？</li>
+<li>在我的目标任务和预算下是否划算？</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>Attention 不是单一技术点，而是一组“机制 + 工程”组合。先用总览建立坐标，再按专题深入，学习和落地都会更快。</p>
 
     
         <div class="post-more-div">
-            <a href="/2026/03/03/qwen2-5-report-reading/" class="post-more waves-button">
+            <a href="/2026/03/03/attention-overview/" class="post-more waves-button">
                 阅读全文 »
             </a>
         </div>
@@ -250,7 +322,7 @@
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/" rel="tag">Qwen2.5</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/" rel="tag">论文阅读</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/" rel="tag">LLM</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Attention/" rel="tag">Attention</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Transformer/" rel="tag">Transformer</a></li></ul>
 
     </div>
     
@@ -258,8 +330,8 @@
 
         </li>
     
-        <li class="post-list-item fade" data-topic="project">
-            <article id="post-hello-world"
+        <li class="post-list-item fade">
+            <article id="post-ppo-policy-optimization-notes"
   class="article-card article-type-post" itemprop="blogPost">
 
     
@@ -267,7 +339,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a href="/2026/03/02/hello-world/">博客迁移到 Tomotoes 主题</a>
+      <a href="/2026/03/03/ppo-policy-optimization-notes/">PPO 在 LLM 对齐中的作用：RLHF 经典方案速记</a>
     </h3>
   
 
@@ -275,29 +347,34 @@
 
 
      <div class="post-meta">
-        <time class="post-time" title="2026-03-02 19:35:00" datetime="2026-03-02T11:35:00.000Z"  itemprop="datePublished">2026-03-02</time>
+        <time class="post-time" title="2026-03-03 22:45:00" datetime="2026-03-03T14:45:00.000Z"  itemprop="datePublished">2026-03-03</time>
 
     </div>
 
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        <p>这篇文章是博客主题切换后的第一篇记录。</p>
-<h2 id="本次调整"><a href="#本次调整" class="headerlink" title="本次调整"></a>本次调整</h2><ul>
-<li>将博客前端切换为 <code>hexo-theme-tomotoes</code></li>
-<li>完成 Hexo 7 兼容处理</li>
-<li>调整站点信息、菜单与页面结构</li>
+        <p>PPO（Proximal Policy Optimization）是 RLHF 里最经典的策略优化方法之一。它的目标是在提升回答偏好的同时，控制策略更新不要过激。</p>
+<h2 id="在-RLHF-链路中的位置"><a href="#在-RLHF-链路中的位置" class="headerlink" title="在 RLHF 链路中的位置"></a>在 RLHF 链路中的位置</h2><p>典型流程是：</p>
+<ol>
+<li>先做 SFT，得到可用初始策略</li>
+<li>用偏好数据训练奖励模型</li>
+<li>用 PPO 优化策略模型，提升高奖励回答概率</li>
+</ol>
+<h2 id="PPO-的核心价值"><a href="#PPO-的核心价值" class="headerlink" title="PPO 的核心价值"></a>PPO 的核心价值</h2><p>PPO 通过约束每次更新幅度，让训练更稳定，减少策略突然崩坏的风险。</p>
+<p>对大模型来说，这种“稳步更新”非常关键。</p>
+<h2 id="成本与难点"><a href="#成本与难点" class="headerlink" title="成本与难点"></a>成本与难点</h2><ul>
+<li>流程更长，组件更多（策略模型、奖励模型、参考模型）</li>
+<li>超参数敏感，调参成本高</li>
+<li>工程复杂度与训练资源要求较高</li>
 </ul>
-<h2 id="历史文章"><a href="#历史文章" class="headerlink" title="历史文章"></a>历史文章</h2><p>旧版本生成的文章链接仍然保留，可从以下入口查看：</p>
-<ul>
-<li><a href="/2024/">旧文章目录</a></li>
-<li><a href="/archives/">归档页</a></li>
-</ul>
-<p>后续会逐步把历史内容整理到新的 Hexo 源码结构中。</p>
+<h2 id="什么时候用-PPO"><a href="#什么时候用-PPO" class="headerlink" title="什么时候用 PPO"></a>什么时候用 PPO</h2><p>当你有较完整的 RLHF 基建，且追求更精细的行为控制时，PPO 仍然是值得投入的方案。</p>
+<p>如果团队资源有限，很多场景会先用 DPO 获得更高性价比。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>PPO 不是“过时方案”，而是“成本更高但可控性更强”的经典工具。要不要用，核心看团队资源与目标精度。</p>
 
     
         <div class="post-more-div">
-            <a href="/2026/03/02/hello-world/" class="post-more waves-button">
+            <a href="/2026/03/03/ppo-policy-optimization-notes/" class="post-more waves-button">
                 阅读全文 »
             </a>
         </div>
@@ -305,7 +382,387 @@
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Theme/" rel="tag">Theme</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Tomotoes/" rel="tag">Tomotoes</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PPO/" rel="tag">PPO</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RLHF/" rel="tag">RLHF</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-dpo-direct-preference-optimization-notes"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a href="/2026/03/03/dpo-direct-preference-optimization-notes/">DPO（直接偏好优化）笔记：不用奖励模型也能做偏好对齐</a>
+    </h3>
+  
+
+
+
+
+     <div class="post-meta">
+        <time class="post-time" title="2026-03-03 22:40:00" datetime="2026-03-03T14:40:00.000Z"  itemprop="datePublished">2026-03-03</time>
+
+    </div>
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        <p>DPO（Direct Preference Optimization）是一种常见的偏好对齐方法。它直接利用“好回答 vs 差回答”的成对数据优化模型，无需单独训练奖励模型。</p>
+<h2 id="DPO-的直觉"><a href="#DPO-的直觉" class="headerlink" title="DPO 的直觉"></a>DPO 的直觉</h2><p>给定同一提示词下的两条回答，DPO 让模型提高优选回答概率，压低劣选回答概率。</p>
+<p>相比传统 RLHF 流程，DPO 更直接，训练链路更短。</p>
+<h2 id="为什么流行"><a href="#为什么流行" class="headerlink" title="为什么流行"></a>为什么流行</h2><ol>
+<li>训练实现相对简单</li>
+<li>稳定性通常较好</li>
+<li>对工程资源要求更友好</li>
+</ol>
+<h2 id="关键前提"><a href="#关键前提" class="headerlink" title="关键前提"></a>关键前提</h2><p>DPO 的效果非常依赖偏好数据质量。如果偏好标注噪声大，模型会学到相互矛盾的信号。</p>
+<h2 id="常见实践要点"><a href="#常见实践要点" class="headerlink" title="常见实践要点"></a>常见实践要点</h2><ul>
+<li>参考模型（reference model）选择会影响训练行为</li>
+<li>偏好数据要覆盖你真正关心的任务域</li>
+<li>线上验证要看“有用性 + 安全性 + 风格一致性”</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>DPO 的价值在于把偏好对齐流程“去复杂化”。在很多团队里，它是从 SFT 迈向高质量助手的高性价比路径。</p>
+
+    
+        <div class="post-more-div">
+            <a href="/2026/03/03/dpo-direct-preference-optimization-notes/" class="post-more waves-button">
+                阅读全文 »
+            </a>
+        </div>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DPO/" rel="tag">DPO</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Preference-Learning/" rel="tag">Preference Learning</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-sft-supervised-finetuning-notes"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a href="/2026/03/03/sft-supervised-finetuning-notes/">SFT（监督微调）笔记：把基础模型变成可用助手的第一步</a>
+    </h3>
+  
+
+
+
+
+     <div class="post-meta">
+        <time class="post-time" title="2026-03-03 22:35:00" datetime="2026-03-03T14:35:00.000Z"  itemprop="datePublished">2026-03-03</time>
+
+    </div>
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        <p>SFT（Supervised Fine-Tuning）通常是对齐阶段的第一步：用高质量指令数据把基础模型从“会续写”拉到“会按指令回答”。</p>
+<h2 id="SFT-解决的核心问题"><a href="#SFT-解决的核心问题" class="headerlink" title="SFT 解决的核心问题"></a>SFT 解决的核心问题</h2><p>预训练模型有知识和语言能力，但不一定稳定遵循指令格式。SFT 的目标是把目标行为直接示范给模型。</p>
+<h2 id="数据决定上限"><a href="#数据决定上限" class="headerlink" title="数据决定上限"></a>数据决定上限</h2><p>SFT 的效果高度依赖数据：</p>
+<ol>
+<li>指令覆盖面是否足够广</li>
+<li>回答质量是否一致</li>
+<li>格式规范是否稳定</li>
+</ol>
+<p>如果示例数据本身不稳，模型只会学到不稳的习惯。</p>
+<h2 id="常见收益"><a href="#常见收益" class="headerlink" title="常见收益"></a>常见收益</h2><ul>
+<li>指令跟随能力明显提升</li>
+<li>回答结构更可控</li>
+<li>后续偏好优化（DPO&#x2F;PPO）更容易收敛</li>
+</ul>
+<h2 id="常见坑"><a href="#常见坑" class="headerlink" title="常见坑"></a>常见坑</h2><ul>
+<li>数据同质化严重，泛化变差</li>
+<li>过度模板化，回答僵硬</li>
+<li>只看 loss 下降，忽视真实任务表现</li>
+</ul>
+<h2 id="实战建议"><a href="#实战建议" class="headerlink" title="实战建议"></a>实战建议</h2><ol>
+<li>先做一版小而干净的数据集，建立稳定基线。</li>
+<li>增量扩数据时做分桶评估，避免“越训越差”。</li>
+<li>SFT 后马上做任务集验证，再决定是否进入 DPO&#x2F;PPO。</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>SFT 不是终点，但往往决定后续对齐能否顺利推进。把数据质量打牢，比盲目堆样本更重要。</p>
+
+    
+        <div class="post-more-div">
+            <a href="/2026/03/03/sft-supervised-finetuning-notes/" class="post-more waves-button">
+                阅读全文 »
+            </a>
+        </div>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Alignment/" rel="tag">Alignment</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SFT/" rel="tag">SFT</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-moe-token-routing-notes"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a href="/2026/03/03/moe-token-routing-notes/">MoE Token 路由机制笔记：为什么能在成本内提升能力</a>
+    </h3>
+  
+
+
+
+
+     <div class="post-meta">
+        <time class="post-time" title="2026-03-03 22:30:00" datetime="2026-03-03T14:30:00.000Z"  itemprop="datePublished">2026-03-03</time>
+
+    </div>
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        <p>这篇文章整理 MoE 中最核心的 token 路由问题：每个 token 如何选择专家，以及这件事为什么直接决定模型效果和推理成本。</p>
+<h2 id="MoE-的核心思想"><a href="#MoE-的核心思想" class="headerlink" title="MoE 的核心思想"></a>MoE 的核心思想</h2><p>MoE（Mixture of Experts）不是让所有参数都参与每次计算，而是让每个 token 只激活少量专家（例如 top-1 或 top-2）。</p>
+<p>这样可以在总参数规模很大的同时，把单次前向计算量控制在可接受范围内。</p>
+<h2 id="Token-路由在做什么"><a href="#Token-路由在做什么" class="headerlink" title="Token 路由在做什么"></a>Token 路由在做什么</h2><p>路由器会对当前 token 输出一组专家得分，然后选择得分最高的若干专家参与计算。</p>
+<p>这个过程的关键点有两个：</p>
+<ol>
+<li>选谁（路由质量）</li>
+<li>负载是否均衡（专家利用率）</li>
+</ol>
+<h2 id="常见工程挑战"><a href="#常见工程挑战" class="headerlink" title="常见工程挑战"></a>常见工程挑战</h2><ul>
+<li>热门专家过载：少数专家被大量 token 选择</li>
+<li>冷门专家闲置：训练利用率低，容量被浪费</li>
+<li>路由抖动：训练早期不稳定，影响收敛</li>
+</ul>
+<h2 id="常见解决思路"><a href="#常见解决思路" class="headerlink" title="常见解决思路"></a>常见解决思路</h2><ol>
+<li>加入负载均衡相关损失，抑制专家极端倾斜。</li>
+<li>设定专家容量上限，避免单个专家被打爆。</li>
+<li>调整 top-k、温度和路由噪声，平衡探索与稳定。</li>
+</ol>
+<h2 id="实战建议"><a href="#实战建议" class="headerlink" title="实战建议"></a>实战建议</h2><ol>
+<li>先看路由统计再谈模型好坏：每层专家命中分布、溢出率、丢弃率。</li>
+<li>线上压测要覆盖长上下文和高并发场景，路由问题常在高压下暴露。</li>
+<li>把路由日志纳入常规监控，不要只盯最终基准分数。</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>MoE 的收益不只来自“参数更多”，更来自“路由是否稳定且均衡”。token 路由做不好，MoE 很容易从优势变成负担。</p>
+
+    
+        <div class="post-more-div">
+            <a href="/2026/03/03/moe-token-routing-notes/" class="post-more waves-button">
+                阅读全文 »
+            </a>
+        </div>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MoE/" rel="tag">MoE</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Token-Routing/" rel="tag">Token Routing</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-rmsnorm-notes"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a href="/2026/03/03/rmsnorm-notes/">RMSNorm 笔记：在大模型中为什么常替代 LayerNorm</a>
+    </h3>
+  
+
+
+
+
+     <div class="post-meta">
+        <time class="post-time" title="2026-03-03 22:20:00" datetime="2026-03-03T14:20:00.000Z"  itemprop="datePublished">2026-03-03</time>
+
+    </div>
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        <p>这篇笔记聚焦 RMSNorm 的核心差异和工程意义。</p>
+<h2 id="RMSNorm-与-LayerNorm-的区别"><a href="#RMSNorm-与-LayerNorm-的区别" class="headerlink" title="RMSNorm 与 LayerNorm 的区别"></a>RMSNorm 与 LayerNorm 的区别</h2><p>LayerNorm 会做均值中心化 + 方差归一化；RMSNorm 主要使用均方根尺度进行归一化，结构更简洁。</p>
+<h2 id="在大模型中的常见优势"><a href="#在大模型中的常见优势" class="headerlink" title="在大模型中的常见优势"></a>在大模型中的常见优势</h2><ol>
+<li>计算更简洁，工程实现成本低</li>
+<li>训练稳定性通常不错</li>
+<li>在大规模训练中已被大量实践验证</li>
+</ol>
+<h2 id="什么时候需要谨慎"><a href="#什么时候需要谨慎" class="headerlink" title="什么时候需要谨慎"></a>什么时候需要谨慎</h2><ul>
+<li>迁移旧模型时，归一化策略变化可能影响原有超参数最优点</li>
+<li>不同任务对归一化的敏感度不同</li>
+</ul>
+<h2 id="实战建议"><a href="#实战建议" class="headerlink" title="实战建议"></a>实战建议</h2><ol>
+<li>归一化层替换后，重新做学习率和 warmup 调参。</li>
+<li>重点关注训练前期震荡和后期收敛平台。</li>
+<li>和激活函数、残差比例一起联动评估。</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>RMSNorm 的价值在于“更简单且足够有效”，这使它在现代 LLM 结构中非常常见。</p>
+
+    
+        <div class="post-more-div">
+            <a href="/2026/03/03/rmsnorm-notes/" class="post-more waves-button">
+                阅读全文 »
+            </a>
+        </div>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Normalization/" rel="tag">Normalization</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RMSNorm/" rel="tag">RMSNorm</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-qkv-bias-notes"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a href="/2026/03/03/qkv-bias-notes/">QKV Bias 在 Transformer 中的作用</a>
+    </h3>
+  
+
+
+
+
+     <div class="post-meta">
+        <time class="post-time" title="2026-03-03 22:15:00" datetime="2026-03-03T14:15:00.000Z"  itemprop="datePublished">2026-03-03</time>
+
+    </div>
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        <p>这篇文章记录 QKV Bias 这个容易被忽略、但会影响训练行为的细节。</p>
+<h2 id="QKV-Bias-是什么"><a href="#QKV-Bias-是什么" class="headerlink" title="QKV Bias 是什么"></a>QKV Bias 是什么</h2><p>在注意力层里，输入会投影成 Q、K、V。QKV Bias 指的是这些线性投影中的偏置项。</p>
+<h2 id="为什么值得关注"><a href="#为什么值得关注" class="headerlink" title="为什么值得关注"></a>为什么值得关注</h2><ul>
+<li>会影响训练初期动态</li>
+<li>可能影响收敛速度与稳定性</li>
+<li>在不同模型规模和训练策略下，收益并不总是同向</li>
+</ul>
+<h2 id="是否一定要开"><a href="#是否一定要开" class="headerlink" title="是否一定要开"></a>是否一定要开</h2><p>不是。是否启用 QKV Bias 应该由实验决定：</p>
+<ol>
+<li>任务类型</li>
+<li>模型规模</li>
+<li>数据规模与分布</li>
+<li>训练超参数设置</li>
+</ol>
+<h2 id="建议的评估方式"><a href="#建议的评估方式" class="headerlink" title="建议的评估方式"></a>建议的评估方式</h2><p>做两组最小对照实验：</p>
+<ul>
+<li>开启 QKV Bias</li>
+<li>关闭 QKV Bias</li>
+</ul>
+<p>同时比较：</p>
+<ul>
+<li>收敛曲线</li>
+<li>验证集效果</li>
+<li>推理效率与稳定性</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>QKV Bias 是“看起来小、但可能有影响”的结构开关。不要凭经验拍板，尽量用小规模可复现实验做决策。</p>
+
+    
+        <div class="post-more-div">
+            <a href="/2026/03/03/qkv-bias-notes/" class="post-more waves-button">
+                阅读全文 »
+            </a>
+        </div>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Attention/" rel="tag">Attention</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/QKV-Bias/" rel="tag">QKV Bias</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-rope-rotary-position-embedding"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a href="/2026/03/03/rope-rotary-position-embedding/">RoPE（旋转位置编码）理解与应用</a>
+    </h3>
+  
+
+
+
+
+     <div class="post-meta">
+        <time class="post-time" title="2026-03-03 22:10:00" datetime="2026-03-03T14:10:00.000Z"  itemprop="datePublished">2026-03-03</time>
+
+    </div>
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        <p>这篇笔记整理 RoPE 的核心思路，以及它为什么适合现代大模型。</p>
+<h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>注意力机制本身不感知顺序，需要位置编码告诉模型“谁在前、谁在后”。</p>
+<h2 id="RoPE-的核心思路"><a href="#RoPE-的核心思路" class="headerlink" title="RoPE 的核心思路"></a>RoPE 的核心思路</h2><p>RoPE 通过对向量做“旋转变换”注入位置信息，使相对位置信息自然体现在注意力计算中。</p>
+<p>相比只加绝对位置向量，RoPE 在长序列建模里往往更稳。</p>
+<h2 id="为什么它常见"><a href="#为什么它常见" class="headerlink" title="为什么它常见"></a>为什么它常见</h2><ol>
+<li>与自注意力计算形式契合</li>
+<li>对相对位置信息建模更自然</li>
+<li>在长上下文扩展场景中表现普遍较好</li>
+</ol>
+<h2 id="实战注意点"><a href="#实战注意点" class="headerlink" title="实战注意点"></a>实战注意点</h2><ul>
+<li>长上下文外推能力不只由 RoPE 决定，还受训练数据和策略影响。</li>
+<li>做上下文扩展时，常要配合额外缩放或插值策略。</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>RoPE 是当前 LLM 里很主流的位置编码方式，优势在于“结构简单 + 长序列友好”。</p>
+
+    
+        <div class="post-more-div">
+            <a href="/2026/03/03/rope-rotary-position-embedding/" class="post-more waves-button">
+                阅读全文 »
+            </a>
+        </div>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Position-Encoding/" rel="tag">Position Encoding</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RoPE/" rel="tag">RoPE</a></li></ul>
 
     </div>
     
@@ -316,6 +773,12 @@
     </ul>
 
     
+<nav id="page-nav">
+    <div class="inner">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
+    </div>
+</nav>
+
 
 </div>
 
@@ -465,114 +928,6 @@ postshow();
         effact: "easeOut",
         content: "把复杂问题讲清楚。"
     });
-
-/* 首页方向标签切换 */
-(function () {
-	var tabsWrap = document.getElementById("topic-tabs-wrap");
-	if (!tabsWrap) return;
-
-	var tabs = tabsWrap.querySelectorAll(".topic-tab");
-	var panels = tabsWrap.querySelectorAll(".topic-panel");
-	var glider = document.getElementById("topic-tab-glider");
-	var postItems = document.querySelectorAll(".post-list .post-list-item");
-	var validTabs = ["paper", "knowledge", "project"];
-	var tabThemeMap = {
-		paper: "paper",
-		knowledge: "knowledge",
-		project: "project"
-	};
-
-	function moveGlider(targetTab) {
-		if (!glider || !targetTab) return;
-		var width = targetTab.offsetWidth;
-		var left = targetTab.offsetLeft;
-		glider.style.width = width + "px";
-		glider.style.transform = "translateX(" + left + "px)";
-	}
-
-	function activateTab(name) {
-		var i = 0;
-		var target = null;
-		for (i = 0; i < tabs.length; i++) {
-			var tab = tabs[i];
-			var active = tab.getAttribute("data-tab") === name;
-			tab.classList.toggle("active", active);
-			tab.setAttribute("aria-selected", active ? "true" : "false");
-			if (active) target = tab;
-		}
-		for (i = 0; i < panels.length; i++) {
-			var panel = panels[i];
-			panel.classList.toggle("active", panel.getAttribute("data-panel") === name);
-		}
-		for (i = 0; i < postItems.length; i++) {
-			var item = postItems[i];
-			var topic = item.getAttribute("data-topic");
-			item.classList.toggle("topic-hidden", topic !== name);
-		}
-		moveGlider(target);
-		document.body.setAttribute("data-topic-tone", tabThemeMap[name] || "paper");
-	}
-
-	window.switchTopicTab = function (tabName) {
-		activateTab(tabName);
-		try {
-			history.replaceState(null, "", "#tab-" + tabName);
-		} catch (e) {}
-	};
-
-	var hashTab = location.hash.replace("#tab-", "");
-	window.switchTopicTab(validTabs.indexOf(hashTab) > -1 ? hashTab : "paper");
-
-	window.addEventListener("resize", function () {
-		var active = tabsWrap.querySelector(".topic-tab.active");
-		moveGlider(active);
-	});
-})();
-
-/* 滚动进度条 */
-(function () {
-	var progress = document.getElementById("scroll-progress");
-	if (!progress) return;
-
-	function updateProgress() {
-		var doc = document.documentElement;
-		var max = doc.scrollHeight - doc.clientHeight;
-		var percent = max > 0 ? (window.scrollY / max) * 100 : 0;
-		progress.style.width = Math.max(0, Math.min(100, percent)) + "%";
-	}
-
-	window.addEventListener("scroll", updateProgress, { passive: true });
-	window.addEventListener("resize", updateProgress);
-	updateProgress();
-})();
-
-/* 文章卡片 3D 悬浮 */
-(function () {
-	if (window.innerWidth < 900) return;
-
-	var cards = document.querySelectorAll(".post-list-item");
-	if (!cards.length) return;
-
-	function tiltCard(card, evt) {
-		var rect = card.getBoundingClientRect();
-		var px = (evt.clientX - rect.left) / rect.width;
-		var py = (evt.clientY - rect.top) / rect.height;
-		var rotateY = (px - 0.5) * 6;
-		var rotateX = (0.5 - py) * 5;
-		card.style.transform = "perspective(900px) rotateX(" + rotateX.toFixed(2) + "deg) rotateY(" + rotateY.toFixed(2) + "deg) translateY(-4px)";
-	}
-
-	for (var i = 0; i < cards.length; i++) {
-		(function (card) {
-			card.addEventListener("mousemove", function (evt) {
-				tiltCard(card, evt);
-			});
-			card.addEventListener("mouseleave", function () {
-				card.style.transform = "";
-			});
-		})(cards[i]);
-	}
-})();
 
 
 
