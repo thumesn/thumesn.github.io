@@ -63,6 +63,7 @@
 
 <body>
     <div id="loading" class="active"></div>
+    <div id="scroll-progress"></div>
     <aside id="menu"   >
   <div class="inner flex-row-vertical">
     <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
@@ -173,14 +174,10 @@
     <div class="container fade-scale">
         <div id="myheader">
             <h1 class="title">
-                 
-                    thumesn 札记
-                
+                <span class="hero-title-line">thumesn 札记</span>
             </h1>
             <h5 class="subtitle">
-                
-                    数学 · 编程 · 生活
-                
+                <span class="hero-subtitle-line">数学 · 编程 · 生活</span>
             </h5>
         </div>
     </div>
@@ -193,6 +190,7 @@
             <button class="topic-tab active" type="button" role="tab" aria-selected="true" data-tab="paper" onclick="switchTopicTab('paper');return false;">论文</button>
             <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="knowledge" onclick="switchTopicTab('knowledge');return false;">知识</button>
             <button class="topic-tab" type="button" role="tab" aria-selected="false" data-tab="project" onclick="switchTopicTab('project');return false;">项目</button>
+            <span class="topic-tab-glider" id="topic-tab-glider" aria-hidden="true"></span>
         </div>
         <div class="topic-panels">
             <section class="topic-panel active" data-panel="paper">
@@ -431,20 +429,38 @@ postshow();
 
 	var tabs = tabsWrap.querySelectorAll(".topic-tab");
 	var panels = tabsWrap.querySelectorAll(".topic-panel");
+	var glider = document.getElementById("topic-tab-glider");
 	var validTabs = ["paper", "knowledge", "project"];
+	var tabThemeMap = {
+		paper: "paper",
+		knowledge: "knowledge",
+		project: "project"
+	};
+
+	function moveGlider(targetTab) {
+		if (!glider || !targetTab) return;
+		var width = targetTab.offsetWidth;
+		var left = targetTab.offsetLeft;
+		glider.style.width = width + "px";
+		glider.style.transform = "translateX(" + left + "px)";
+	}
 
 	function activateTab(name) {
 		var i = 0;
+		var target = null;
 		for (i = 0; i < tabs.length; i++) {
 			var tab = tabs[i];
 			var active = tab.getAttribute("data-tab") === name;
 			tab.classList.toggle("active", active);
 			tab.setAttribute("aria-selected", active ? "true" : "false");
+			if (active) target = tab;
 		}
 		for (i = 0; i < panels.length; i++) {
 			var panel = panels[i];
 			panel.classList.toggle("active", panel.getAttribute("data-panel") === name);
 		}
+		moveGlider(target);
+		document.body.setAttribute("data-topic-tone", tabThemeMap[name] || "paper");
 	}
 
 	window.switchTopicTab = function (tabName) {
@@ -456,6 +472,56 @@ postshow();
 
 	var hashTab = location.hash.replace("#tab-", "");
 	window.switchTopicTab(validTabs.indexOf(hashTab) > -1 ? hashTab : "paper");
+
+	window.addEventListener("resize", function () {
+		var active = tabsWrap.querySelector(".topic-tab.active");
+		moveGlider(active);
+	});
+})();
+
+/* 滚动进度条 */
+(function () {
+	var progress = document.getElementById("scroll-progress");
+	if (!progress) return;
+
+	function updateProgress() {
+		var doc = document.documentElement;
+		var max = doc.scrollHeight - doc.clientHeight;
+		var percent = max > 0 ? (window.scrollY / max) * 100 : 0;
+		progress.style.width = Math.max(0, Math.min(100, percent)) + "%";
+	}
+
+	window.addEventListener("scroll", updateProgress, { passive: true });
+	window.addEventListener("resize", updateProgress);
+	updateProgress();
+})();
+
+/* 文章卡片 3D 悬浮 */
+(function () {
+	if (window.innerWidth < 900) return;
+
+	var cards = document.querySelectorAll(".post-list-item");
+	if (!cards.length) return;
+
+	function tiltCard(card, evt) {
+		var rect = card.getBoundingClientRect();
+		var px = (evt.clientX - rect.left) / rect.width;
+		var py = (evt.clientY - rect.top) / rect.height;
+		var rotateY = (px - 0.5) * 6;
+		var rotateX = (0.5 - py) * 5;
+		card.style.transform = "perspective(900px) rotateX(" + rotateX.toFixed(2) + "deg) rotateY(" + rotateY.toFixed(2) + "deg) translateY(-4px)";
+	}
+
+	for (var i = 0; i < cards.length; i++) {
+		(function (card) {
+			card.addEventListener("mousemove", function (evt) {
+				tiltCard(card, evt);
+			});
+			card.addEventListener("mouseleave", function () {
+				card.style.transform = "";
+			});
+		})(cards[i]);
+	}
 })();
 
 

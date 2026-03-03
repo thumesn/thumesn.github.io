@@ -5817,12 +5817,43 @@ body > img {
   --tm-ink-soft: #556b89;
   --tm-accent: #1e5cba;
   --tm-accent-soft: #5f8cd9;
+  --tm-accent-glow: rgba(79, 138, 223, 0.35);
   --tm-shadow: 0 18px 40px rgba(20, 44, 81, 0.12);
 }
 
 body {
   color: var(--tm-ink);
   background: var(--tm-bg-0);
+}
+
+body[data-topic-tone="paper"] {
+  --tm-accent: #1d5fbe;
+  --tm-accent-soft: #4e8dd9;
+  --tm-accent-glow: rgba(68, 123, 215, 0.35);
+}
+
+body[data-topic-tone="knowledge"] {
+  --tm-accent: #1f8b84;
+  --tm-accent-soft: #43b6a9;
+  --tm-accent-glow: rgba(68, 177, 161, 0.32);
+}
+
+body[data-topic-tone="project"] {
+  --tm-accent: #365fb5;
+  --tm-accent-soft: #6f8fdf;
+  --tm-accent-glow: rgba(96, 127, 219, 0.35);
+}
+
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  z-index: 1200;
+  background: linear-gradient(90deg, var(--tm-accent), var(--tm-accent-soft));
+  box-shadow: 0 0 12px var(--tm-accent-glow);
+  transition: width 0.12s linear, background 0.2s ease;
 }
 
 #main {
@@ -5837,6 +5868,19 @@ body {
   pointer-events: none;
   z-index: -1;
   background-image: radial-gradient(circle at 14% 12%, rgba(121, 168, 236, 0.22), transparent 42%), radial-gradient(circle at 88% 6%, rgba(122, 210, 207, 0.16), transparent 36%), radial-gradient(circle at 72% 88%, rgba(98, 122, 225, 0.14), transparent 34%);
+  background-size: 130% 130%;
+  animation: meshFloat 18s ease-in-out infinite alternate;
+}
+
+#main::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.15;
+  background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 3px);
+  animation: grainShift 0.6s steps(2) infinite;
 }
 
 .top-header.fixed {
@@ -5868,6 +5912,18 @@ body {
   color: #445974;
 }
 
+.hero-title-line,
+.hero-subtitle-line {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: heroRise 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-subtitle-line {
+  animation-delay: 0.14s;
+}
+
 .post-list .post-title a {
   color: var(--tm-ink);
   text-shadow: none;
@@ -5890,6 +5946,8 @@ body {
 
 .post-list-item {
   overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.26s ease, box-shadow 0.26s ease, border-color 0.26s ease;
 }
 
 .post-list-item::before {
@@ -5897,6 +5955,20 @@ body {
   display: block;
   height: 3px;
   background-image: linear-gradient(90deg, var(--tm-accent-soft) 0%, #63b8db 100%);
+}
+
+.post-list-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 18%, rgba(255, 255, 255, 0.38) 48%, transparent 75%);
+  transform: translateX(-130%);
+  transition: transform 0.55s ease;
+}
+
+.post-list-item:hover::after {
+  transform: translateX(130%);
 }
 
 .post-list-item:hover {
@@ -5974,6 +6046,8 @@ body {
   border-radius: 14px;
   border: 1px solid rgba(86, 112, 152, 0.3);
   background: #101828;
+  box-shadow: 0 0 0 rgba(64, 116, 205, 0.1);
+  animation: codePulse 2.8s ease-in-out infinite;
 }
 
 .post-content pre code {
@@ -6044,9 +6118,13 @@ body {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 10px;
+  position: relative;
+  padding: 2px;
 }
 
 .topic-tab {
+  position: relative;
+  z-index: 2;
   appearance: none;
   -webkit-appearance: none;
   border: 1px solid rgba(116, 143, 188, 0.38);
@@ -6070,9 +6148,24 @@ body {
 
 .topic-tab.active {
   color: #fff;
-  border-color: rgba(45, 101, 181, 0.9);
-  background-image: linear-gradient(115deg, #316ec8 0%, #4f8fd9 100%);
-  box-shadow: 0 10px 20px rgba(31, 79, 151, 0.26);
+  border-color: rgba(255, 255, 255, 0.45);
+  background-image: linear-gradient(115deg, var(--tm-accent) 0%, var(--tm-accent-soft) 100%);
+  box-shadow: 0 10px 20px var(--tm-accent-glow);
+}
+
+.topic-tab-glider {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 0;
+  height: calc(100% - 4px);
+  border-radius: 999px;
+  background: linear-gradient(115deg, var(--tm-accent) 0%, var(--tm-accent-soft) 100%);
+  box-shadow: 0 8px 18px var(--tm-accent-glow);
+  transform: translateX(0);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s cubic-bezier(0.22, 1, 0.36, 1), background 0.24s ease;
+  pointer-events: none;
+  opacity: 0.85;
 }
 
 .topic-panels {
@@ -6090,7 +6183,7 @@ body {
 
 .topic-panel.active {
   display: block;
-  animation: topicFade 0.26s ease;
+  animation: topicFade 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .topic-panel h3 {
@@ -6118,7 +6211,7 @@ body {
 .topic-link {
   display: inline-block;
   margin-top: 10px;
-  color: #1c5ba7;
+  color: var(--tm-accent);
   text-decoration: none;
   font-weight: 500;
 }
@@ -6139,14 +6232,63 @@ body {
   }
 }
 
+@keyframes heroRise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes meshFloat {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 16% 10%;
+  }
+}
+
+@keyframes grainShift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(1px, -1px);
+  }
+}
+
+@keyframes codePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(61, 119, 211, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(61, 119, 211, 0.26);
+  }
+}
+
 @media screen and (max-width: 760px) {
   .topic-tab {
     padding: 8px 13px;
   }
 
+  .topic-tab-glider {
+    display: none;
+  }
+
   .topic-panel {
     border-radius: 12px;
     padding: 12px 14px;
+  }
+
+  .post-list-item::after {
+    display: none;
   }
 }
 
@@ -6158,4 +6300,24 @@ body {
 .archive-article .post-title,
 .post-list .post-title a {
   text-shadow: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #main::before,
+  #main::after,
+  .hero-title-line,
+  .hero-subtitle-line,
+  .topic-panel.active,
+  .post-content pre,
+  .post-content .highlight {
+    animation: none !important;
+  }
+
+  .topic-tab-glider,
+  .topic-tab,
+  .post-list-item,
+  .post-list-item::after,
+  #scroll-progress {
+    transition: none !important;
+  }
 }
