@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Language" content="zh-cn">
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Qwen2.5 技术报告阅读笔记 | thumesn 札记</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    
+    <meta name="theme-color" content="#3A7AFE">
+    
+    
+    <meta name="keywords" content="Qwen2.5,技术报告,论文阅读,LLM">
+    
+    
+
+    
+
+    <!-- Baidu Push -->
+<script>
+	(function(){
+		var bp = document.createElement('script');
+		var curProtocol = window.location.protocol.split(':')[0];
+		if (curProtocol === 'https') {
+			bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+		}
+		else {
+			bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+		}
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(bp, s);
+	})();
+
+	var _hmt = _hmt || [];
+</script>
+
+
+
+    
+    <meta name="description" content="这篇笔记记录我对《Qwen2.5 Technical Report》的首次系统阅读，重点关注训练规模、对齐流程、实验结论和可复用的工程启发。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qwen2.5 技术报告阅读笔记">
+<meta property="og:url" content="https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/index.html">
+<meta property="og:site_name" content="thumesn 札记">
+<meta property="og:description" content="这篇笔记记录我对《Qwen2.5 Technical Report》的首次系统阅读，重点关注训练规模、对齐流程、实验结论和可复用的工程启发。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-03T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-03-03T13:30:00.000Z">
+<meta property="article:author" content="thumesn">
+<meta property="article:tag" content="Qwen2.5">
+<meta property="article:tag" content="论文阅读">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="thumesn 札记" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link id="style" rel="stylesheet" href="/css/style.css?v=3.0">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+            
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+    <aside id="menu"  class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" >
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg" alt="avatar">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname" id="name">thumesn</h5>
+          
+            <div id="mymotto" class="motto"></div>
+          
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+              <li class="waves-block waves-effect">
+                  <a href="/"  >
+                    <i class="icon icon-lg icon-home"></i>
+                    <span>首页</span><i class="icon icon-lg icon-caret-left"></i>
+                  </a>
+              </li>
+            
+              <li class="waves-block waves-effect">
+                  <a href="/archives"  >
+                    <i class="icon icon-lg icon-archives"></i>
+                    <span>归档</span><i class="icon icon-lg icon-caret-left"></i>
+                  </a>
+              </li>
+            
+              <li class="waves-block waves-effect">
+                  <a href="/categories"  >
+                    <i class="icon icon-lg icon-th-list"></i>
+                    <span>分类</span><i class="icon icon-lg icon-caret-left"></i>
+                  </a>
+              </li>
+            
+              <li class="waves-block waves-effect">
+                  <a href="/tags"  >
+                    <i class="icon icon-lg icon-tags"></i>
+                    <span>标签</span><i class="icon icon-lg icon-caret-left"></i>
+                  </a>
+              </li>
+            
+              <li class="waves-block waves-effect">
+                  <a href="/about"  >
+                    <i class="icon icon-lg icon-smile-o"></i>
+                    <span>关于</span><i class="icon icon-lg icon-caret-left"></i>
+                  </a>
+              </li>
+            
+      <div class="nav2">
+          
+              <a class="nav2item" data-title="Github" href="https://github.com/thumesn" target="_blank"title="Github" >
+                <i class="icon icon-lg icon-github github"></i>
+              </a>
+          
+              <a class="nav2item" data-title="归档" href="/archives" target="_self"title="归档" >
+                <i class="icon icon-lg icon-book book"></i>
+              </a>
+          
+              <a class="nav2item" data-title="RSS" href="/atom.xml" target="_self"title="RSS" >
+                <i class="icon icon-lg icon-rss rss"></i>
+              </a>
+          
+
+            </div>
+        
+      </ul>
+        
+    </div>
+  </div>
+ 
+</aside>
+
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Qwen2.5 技术报告阅读笔记</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        <a href="../../atom.xml" target="_blank" class="header-icon waves-effect waves-circle waves-light" id="Rss">
+            <i class="icon icon-lg icon-rss"></i>
+        </a>
+    </div>
+</header>
+<header class="content-header post-header">
+    
+    
+    <div class="container fade-scale">
+        <div id="myheader">
+            <h1 class="title">
+                
+            </h1>
+            <h5 class="subtitle">
+                
+                
+            </h5>
+        </div>
+    </div>
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#paper-overview"><span class="post-toc-number">1.</span> <span class="post-toc-text">论文信息</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#main-updates"><span class="post-toc-number">2.</span> <span class="post-toc-text">最关键的三点更新</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#training-alignment"><span class="post-toc-number">3.</span> <span class="post-toc-text">训练与对齐流程理解</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#benchmark-view"><span class="post-toc-number">4.</span> <span class="post-toc-text">怎么读实验结论</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#takeaways"><span class="post-toc-number">5.</span> <span class="post-toc-text">启发与后续计划</span></a></li></ol>
+        </nav>
+    </aside>
+   
+<article id="post-qwen2-5-report-reading"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Qwen2.5 技术报告阅读笔记</h1>
+        <div class="post-meta">
+            <i class="icon icon-lg icon-calendar-o"></i>
+            发表于
+            <time class="post-time" title="2026-03-03 21:00:00" datetime="2026-03-03T13:00:00.000Z"  itemprop="datePublished">2026-03-03</time>
+
+            <br id="mybreak"/>
+            
+	<i class="icon icon-lg icon-folder-o"></i>
+	分类：<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/">论文阅读</a></li></ul>
+
+
+            <i>·</i>
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>次浏览
+</span>
+
+
+        </div>
+        <div class="post-count-custom">
+            <i class="icon icon-lg icon-comment-o"></i>
+            阅读本文可能花费您&nbsp;<span class="post-count">8</span>&nbsp;分钟
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>这篇笔记记录我第一次系统阅读 <strong>Qwen2.5 Technical Report</strong> 的过程。目标很直接：不追求“抄结论”，而是提炼出可以迁移到自己项目里的方法与判断框架。</p>
+<h2 id="paper-overview"><a href="#paper-overview" class="headerlink" title="论文信息"></a>论文信息</h2><ul>
+<li>标题：<em>Qwen2.5 Technical Report</em></li>
+<li>链接：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2412.15115">arXiv:2412.15115</a></li>
+<li>我关注的问题：Qwen2.5 相比上一代到底“升级在哪”，这些升级是否可解释、可复用</li>
+</ul>
+<h2 id="main-updates"><a href="#main-updates" class="headerlink" title="最关键的三点更新"></a>最关键的三点更新</h2><ol>
+<li><strong>预训练规模继续放大</strong>：报告提到预训练 token 规模从约 <code>7T</code> 扩展到约 <code>18T</code>，数据覆盖和分布广度显著提升。</li>
+<li><strong>对齐数据与流程加强</strong>：指令数据规模扩展到百万级，并采用多阶段 SFT + 基于反馈的强化学习流程。</li>
+<li><strong>产品化分层更清晰</strong>：Max / Turbo / Plus 的定位区分明显，兼顾极致能力与推理成本。</li>
+</ol>
+<h2 id="training-alignment"><a href="#training-alignment" class="headerlink" title="训练与对齐流程理解"></a>训练与对齐流程理解</h2><p>我把这份报告里的训练路线压缩成一个四步框架：</p>
+<ol>
+<li>大规模预训练打底（知识与语言能力）</li>
+<li>高质量指令样本做监督微调（行为格式化）</li>
+<li>偏好数据驱动强化学习（回答风格与稳定性）</li>
+<li>面向不同产品形态做策略与效率平衡（Max/Turbo/Plus）</li>
+</ol>
+<p>这条路线的价值不在“某个单点技巧”，而在于把<strong>能力</strong>、<strong>可控性</strong>和<strong>服务成本</strong>放在同一体系里优化。</p>
+<h2 id="benchmark-view"><a href="#benchmark-view" class="headerlink" title="怎么读实验结论"></a>怎么读实验结论</h2><p>报告在摘要层面给了几个关键信号（以下为作者报告结果）：</p>
+<ul>
+<li>Qwen2.5-Max 在公开基准上相较当时部分同规模或更大规模开源模型有竞争力。</li>
+<li>Qwen2.5-Turbo 与 Qwen2.5-Plus 分别对标不同成本档位，强调“性能/延迟/成本”的工程折中。</li>
+</ul>
+<p>我自己的阅读策略是：先看趋势和方法论，再在实测中验证“是否适合我的任务”，而不是只看单一榜单名次。</p>
+<h2 id="takeaways"><a href="#takeaways" class="headerlink" title="启发与后续计划"></a>启发与后续计划</h2><ol>
+<li>做模型评估时必须并行看三件事：能力上限、稳定性、单位成本。</li>
+<li>构建自己的“小型偏好数据集”很重要，能明显提升回答风格的一致性。</li>
+<li>下一步我会针对自己的中文技术写作任务，做一轮 Qwen2.5 与现有方案的 A/B 对比。</li>
+</ol>
+<p>如果你也在做 LLM 工程化，建议从“任务目标 + 预算约束 + 可观测指标”这三点出发读报告，会更快抓住真正有用的信息。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新：<time datetime="2026-03-03T13:30:00.000Z" itemprop="dateUpdated">2026-03-03 21:30:00</time>
+</span>
+
+
+        
+        原文链接：<a href="/2026/03/03/qwen2-5-report-reading/" target="_blank" rel="external">https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/</a>
+        
+    </div>
+    <footer>
+        <div onclick="location.href='https://thumesn.github.io'">
+            <img src="/img/avatar.jpg" alt="thumesn">
+            <a>thumesn</a>
+        </div>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/" rel="tag">Qwen2.5</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/" rel="tag">论文阅读</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/" rel="tag">LLM</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&pic=https://thumesn.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&source=记录学习、笔记与生活。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&via=https://thumesn.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+
+
+    
+    
+
+    
+
+    
+
+
+</article>
+
+</div>
+
+        <footer class="footer">
+    <div class="footer-content">
+        <span class="power">
+            <i class="icon icon-lg icon-copyright"></i>
+            2024
+            <i class="icon icon-lg icon-heart"></i>
+            <a href="https://thumesn.github.io">thumesn.github.io</a>
+            <br/>
+            Power by
+            <a href="https://hexo.io/" target="_blank" rel="external nofollow">Hexo</a>&nbsp;·&nbsp;
+            Theme
+            <a class="tomotoeslink" href="https://github.com/tomotoes/hexo-theme-tomotoes/" target="_blank" rel="external nofollow">tomotoes</a>
+        </span>
+
+        <br/>
+
+        <span id="RunTime" style="color:#a7a7a2;"></span>
+        <br/>
+
+        <span>
+            
+	<i class="icon icon-lg icon-user">
+<span id="busuanzi_container_site_uv" style='display:none'>
+       访问用户：<span id="busuanzi_value_site_uv"></span>
+    </span>人</i>
+    ·
+    <i class="icon icon-lg icon-eye">
+    <span id="busuanzi_container_site_pv" style='display:none'>
+      访问次数：<span id="busuanzi_value_site_pv"></span>
+    </span>次
+    </i>
+
+
+        </span>
+        <br/>
+
+        <span class="license"><a  target="_blank" rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">博客内容遵循 知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+    </div>
+</footer>
+
+    </main>
+    
+        
+
+    
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&pic=https://thumesn.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&source=记录学习、笔记与生活。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&via=https://thumesn.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p class="wechatshare">扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <!-- waves按钮特效 -->
+<script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<!-- 主题配置脚本 -->
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+</script>
+
+<!-- jquery -->
+<script src="/js/jquery.min.js?v=3.0"></script>
+
+<!-- 搜索 -->
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item waves-block waves-effect" onclick="location.href='{path}'">
+    <div class="title ellipsis" title="{title}">{title}</div>
+</li>
+</template>
+
+
+<!-- main博客脚本 -->
+<script src="/js/main.min.js?v=3.0" ></script>
+
+<!-- 动画&配置 -->
+<script src="/js/script.min.js?v=3.0" ></script>
+
+<!-- 脚本管理 -->
+<script>
+
+if(window.innerWidth > 800){
+	/* 3D标题 */
+	$(".content-header").on("mousemove", threedee);
+
+	/* 底部追随鼠标 */
+	$(".footer").hover(2);
+
+	/* gotop键的涟漪 */
+	$("#gotop").hover(1);
+
+	/* 赞赏的粒子雨 */
+	$("#reward").hover(3);
+
+	/* 微信公众号的底部渲染 */
+	$("#wechat").hover(4);
+
+    /* 标题跳动 */
+    $(".archivestitle").bumpyText();
+
+	/* 图片点击放大 */
+	const postimg = jQuery(".post-content img:not(.github-emoji)");
+	postimg.on("click",function(){
+
+		mask.classList.add("in");
+		main.classList.add("Mask");
+		menu.classList.add("Mask");
+		var myimg = this.cloneNode(true);
+		myimg.classList.add("imgShow");
+
+		setTimeout(function(){
+			jQuery(myimg).animate({
+				opacity:"1"
+			},1000);
+		},0);
+
+		document.body.appendChild(myimg);
+
+		myimg.onclick=function(){
+			document.body.removeChild(myimg);
+			mask.classList.remove("in");
+			main.classList.remove("Mask");
+			menu.classList.remove("Mask");
+		};
+
+	});
+
+}
+
+/* 名字跳动 */
+$("#name").bumpyText();
+
+
+/* 网站运行时间 */
+setInterval(function () {
+	setTime("2024/02/01");
+}, 1000);
+
+/* 文章块的淡出 */
+postshow();
+
+/* 座右铭 */
+
+    elasticText({
+        id: "mymotto",
+        duration: 100,
+        effact: "easeOut",
+        content: "把复杂问题讲清楚。"
+    });
+
+
+
+/* 粘贴提示 */
+G($(".post-content"), location.href, "thumesn");
+
+
+/* 控制台 */
+if (window.console && window.console.log) {
+	setTimeout(function () {
+		console.log("\n %c 一个坏掉的番茄 %c  © Simon Ma  http://tomotoes.com \n\n", "color:#FFFFFB;background:#1abc9c;padding:5px 0;border-radius:.5rem 0 0 .5rem;", "color:#FFFFFB;background:#080808;padding:5px 0;border-radius:0 .5rem .5rem 0;");
+	}, 0);
+}
+
+</script>
+
+
+
+
+<!-- 公式渲染 -->
+
+
+
+<!-- 不蒜子 -->
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":320,"hOffset":20,"vOffset":-20},"mobile":{"show":false},"react":{"opacityDefault":0.8,"opacityOnHover":0.2}});</script></body>
+</html>

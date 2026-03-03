@@ -1,1 +1,5 @@
-blog-source/
+blog-source/*
+!blog-source/source/
+blog-source/source/*
+!blog-source/source/_posts/
+!blog-source/source/_posts/*.md
