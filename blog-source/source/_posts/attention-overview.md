@@ -2,11 +2,8 @@
 title: Attention 全览：从 MHA 到 GQA、RoPE 与工程优化
 date: 2026-03-03 23:00:00
 categories:
-  - 技术笔记
-  - 架构拆解
-tags:
-  - Attention
-  - Transformer
+  - 技术
+  - LLM
   - LLM
 ---
 

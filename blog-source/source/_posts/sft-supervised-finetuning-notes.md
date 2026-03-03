@@ -2,11 +2,8 @@
 title: SFT（监督微调）笔记：把基础模型变成可用助手的第一步
 date: 2026-03-03 22:35:00
 categories:
-  - 技术笔记
-  - 训练与对齐
-tags:
-  - SFT
-  - Alignment
+  - 技术
+  - LLM
   - LLM
 ---
 

@@ -2,11 +2,8 @@
 title: RoPE（旋转位置编码）理解与应用
 date: 2026-03-03 22:10:00
 categories:
-  - 技术笔记
-  - 架构拆解
-tags:
-  - RoPE
-  - Position Encoding
+  - 技术
+  - LLM
   - LLM
 ---
 

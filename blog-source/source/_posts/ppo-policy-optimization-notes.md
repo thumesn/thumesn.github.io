@@ -2,11 +2,8 @@
 title: PPO 在 LLM 对齐中的作用：RLHF 经典方案速记
 date: 2026-03-03 22:45:00
 categories:
-  - 技术笔记
-  - 训练与对齐
-tags:
-  - PPO
-  - RLHF
+  - 技术
+  - LLM
   - LLM
 ---
 

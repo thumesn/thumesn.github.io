@@ -2,11 +2,8 @@
 title: QKV Bias 在 Transformer 中的作用
 date: 2026-03-03 22:15:00
 categories:
-  - 技术笔记
-  - 架构拆解
-tags:
-  - QKV Bias
-  - Attention
+  - 技术
+  - LLM
   - LLM
 ---
 

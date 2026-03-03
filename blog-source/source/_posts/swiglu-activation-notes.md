@@ -2,11 +2,8 @@
 title: SwiGLU 激活函数笔记：为什么在大模型里常见
 date: 2026-03-03 22:05:00
 categories:
-  - 技术笔记
-  - 架构拆解
-tags:
-  - SwiGLU
-  - Activation
+  - 技术
+  - LLM
   - LLM
 ---
 

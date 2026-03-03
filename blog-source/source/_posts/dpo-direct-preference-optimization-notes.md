@@ -2,11 +2,8 @@
 title: DPO（直接偏好优化）笔记：不用奖励模型也能做偏好对齐
 date: 2026-03-03 22:40:00
 categories:
-  - 技术笔记
-  - 训练与对齐
-tags:
-  - DPO
-  - Preference Learning
+  - 技术
+  - LLM
   - LLM
 ---
 

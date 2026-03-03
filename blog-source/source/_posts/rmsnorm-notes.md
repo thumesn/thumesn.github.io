@@ -2,11 +2,8 @@
 title: RMSNorm 笔记：在大模型中为什么常替代 LayerNorm
 date: 2026-03-03 22:20:00
 categories:
-  - 技术笔记
-  - 架构拆解
-tags:
-  - RMSNorm
-  - Normalization
+  - 技术
+  - LLM
   - LLM
 ---
 

@@ -2,11 +2,8 @@
 title: MoE Token 路由机制笔记：为什么能在成本内提升能力
 date: 2026-03-03 22:30:00
 categories:
-  - 技术笔记
-  - 架构拆解
-tags:
-  - MoE
-  - Token Routing
+  - 技术
+  - LLM
   - LLM
 ---
 
