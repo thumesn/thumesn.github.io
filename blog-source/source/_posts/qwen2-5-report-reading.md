@@ -9,13 +9,52 @@ tags:
   - LLM
 ---
 
-这篇笔记记录我第一次系统阅读 **Qwen2.5 Technical Report** 的过程。目标很直接：不追求“抄结论”，而是提炼出可以迁移到自己项目里的方法与判断框架。
+这篇笔记记录我第一次系统阅读 **Qwen2.5 Technical Report** 的过程。
 
 ## 论文信息
 
 - 标题：*Qwen2.5 Technical Report*
 - 链接：[arXiv:2412.15115](https://arxiv.org/abs/2412.15115)
-- 我关注的问题：Qwen2.5 相比上一代到底“升级在哪”，这些升级是否可解释、可复用
+- 我关注的问题：Qwen2.5  的训练过程和一些之前没注意到的细节
+
+## 小小细节
+
+开源生态中 主要有 qwen 、llama 、mistral
+
+qwen 2.5 turbo plus 为 moe 架构
+
+数据集中在 知识变成和数学能力上。后训练有一百万的sft dpo grpo 都被使用到了
+
+## 模型架构
+
+### dense 模型
+- [Attention 全览](/2026/03/03/attention-overview/)
+- [GQA](/2026/03/03/gqa-grouped-query-attention/)
+- [SwiGLU](/2026/03/03/swiglu-activation-notes/)
+- [RoPE](/2026/03/03/rope-rotary-position-embedding/)
+- [QKV Bias](/2026/03/03/qkv-bias-notes/)
+- [RMSNorm](/2026/03/03/rmsnorm-notes/)
+
+
+在 dense 模型上，Qwen2.5 仍然保留了 Transformer-based 主干结构。这里不展开细节，分别拆成独立文章，便于后续持续补充。
+
+
+### Moe 模型
+
+- [MoE Token 路由](/2026/03/03/moe-token-routing-notes/)
+
+使用特殊的 MoE 层代替常规 FFN 层后，每个 token 不再激活全部专家，而是通过路由器选择少量专家参与计算。
+
+### token
+
+- 在报告里，token 规模扩到更高量级，是能力提升的重要基础。
+- 控制 token 从 3 扩充到 22 后，工具调用与结构化能力也更容易做分工优化。
+
+## 对齐训练流程
+
+- [SFT（监督微调）](/2026/03/03/sft-supervised-finetuning-notes/)
+- [DPO（直接偏好优化）](/2026/03/03/dpo-direct-preference-optimization-notes/)
+- [PPO（策略优化）](/2026/03/03/ppo-policy-optimization-notes/)
 
 ## 最关键的三点更新
 

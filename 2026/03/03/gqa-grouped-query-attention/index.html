@@ -6,13 +6,13 @@
     
     
     
-    <title>Qwen2.5 技术报告阅读笔记 | thumesn 札记</title>
+    <title>GQA（Grouped Query Attention）技术拆解 | thumesn 札记</title>
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
     
     <meta name="theme-color" content="#3A7AFE">
     
     
-    <meta name="keywords" content="LLM,Qwen2.5,论文阅读">
+    <meta name="keywords" content="GQA,Attention,LLM">
     
     
 
@@ -39,19 +39,19 @@
 
 
     
-    <meta name="description" content="这篇笔记记录我第一次系统阅读 Qwen2.5 Technical Report 的过程。 论文信息 标题：Qwen2.5 Technical Report 链接：arXiv:2412.15115 我关注的问题：Qwen2.5  的训练过程和一些之前没注意到的细节  小小细节开源生态中 主要有 qwen 、llama 、mistral qwen 2.5 turbo plus 为 moe 架构 数据集">
+    <meta name="description" content="这篇文章聚焦 GQA（Grouped Query Attention）的核心动机、实现方式和工程价值。 为什么会有 GQA标准 Multi-Head Attention 在推理阶段需要缓存大量 KV，模型越大、上下文越长，KV Cache 压力越高。 GQA 的核心目标是：在尽量少损失效果的前提下，降低 KV Cache 和带宽开销。 核心思想GQA 把多个 Query Head 共享到同一组 K">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Qwen2.5 技术报告阅读笔记">
-<meta property="og:url" content="https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/index.html">
+<meta property="og:title" content="GQA（Grouped Query Attention）技术拆解">
+<meta property="og:url" content="https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/index.html">
 <meta property="og:site_name" content="thumesn 札记">
-<meta property="og:description" content="这篇笔记记录我第一次系统阅读 Qwen2.5 Technical Report 的过程。 论文信息 标题：Qwen2.5 Technical Report 链接：arXiv:2412.15115 我关注的问题：Qwen2.5  的训练过程和一些之前没注意到的细节  小小细节开源生态中 主要有 qwen 、llama 、mistral qwen 2.5 turbo plus 为 moe 架构 数据集">
+<meta property="og:description" content="这篇文章聚焦 GQA（Grouped Query Attention）的核心动机、实现方式和工程价值。 为什么会有 GQA标准 Multi-Head Attention 在推理阶段需要缓存大量 KV，模型越大、上下文越长，KV Cache 压力越高。 GQA 的核心目标是：在尽量少损失效果的前提下，降低 KV Cache 和带宽开销。 核心思想GQA 把多个 Query Head 共享到同一组 K">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-03-03T13:00:00.000Z">
-<meta property="article:modified_time" content="2026-03-03T10:34:13.037Z">
+<meta property="article:published_time" content="2026-03-03T14:00:00.000Z">
+<meta property="article:modified_time" content="2026-03-03T08:58:34.251Z">
 <meta property="article:author" content="thumesn">
+<meta property="article:tag" content="GQA">
+<meta property="article:tag" content="Attention">
 <meta property="article:tag" content="LLM">
-<meta property="article:tag" content="Qwen2.5">
-<meta property="article:tag" content="论文阅读">
 <meta name="twitter:card" content="summary">
     
         <link rel="alternate" type="application/atom+xml" title="thumesn 札记" href="/atom.xml">
@@ -154,7 +154,7 @@
         <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
           <i class="icon icon-lg icon-navicon"></i>
         </a>
-        <div class="flex-col header-title ellipsis">Qwen2.5 技术报告阅读笔记</div>
+        <div class="flex-col header-title ellipsis">GQA（Grouped Query Attention）技术拆解</div>
         
         <div class="search-wrap" id="search-wrap">
             <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
@@ -194,24 +194,24 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%BA%E6%96%87%E4%BF%A1%E6%81%AF"><span class="post-toc-number">1.</span> <span class="post-toc-text">论文信息</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B0%8F%E5%B0%8F%E7%BB%86%E8%8A%82"><span class="post-toc-number">2.</span> <span class="post-toc-text">小小细节</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A8%A1%E5%9E%8B%E6%9E%B6%E6%9E%84"><span class="post-toc-number">3.</span> <span class="post-toc-text">模型架构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#dense-%E6%A8%A1%E5%9E%8B"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">dense 模型</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Moe-%E6%A8%A1%E5%9E%8B"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">Moe 模型</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#token"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">token</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AF%B9%E9%BD%90%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="post-toc-number">4.</span> <span class="post-toc-text">对齐训练流程</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E4%B8%89%E7%82%B9%E6%9B%B4%E6%96%B0"><span class="post-toc-number">5.</span> <span class="post-toc-text">最关键的三点更新</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%AD%E7%BB%83%E4%B8%8E%E5%AF%B9%E9%BD%90%E6%B5%81%E7%A8%8B%E7%90%86%E8%A7%A3"><span class="post-toc-number">6.</span> <span class="post-toc-text">训练与对齐流程理解</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%8E%E4%B9%88%E8%AF%BB%E5%AE%9E%E9%AA%8C%E7%BB%93%E8%AE%BA"><span class="post-toc-number">7.</span> <span class="post-toc-text">怎么读实验结论</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%90%AF%E5%8F%91%E4%B8%8E%E5%90%8E%E7%BB%AD%E8%AE%A1%E5%88%92"><span class="post-toc-number">8.</span> <span class="post-toc-text">启发与后续计划</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89-GQA"><span class="post-toc-number">1.</span> <span class="post-toc-text">为什么会有 GQA</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="post-toc-number">2.</span> <span class="post-toc-text">核心思想</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%8E-MHA-MQA-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="post-toc-number">3.</span> <span class="post-toc-text">与 MHA &#x2F; MQA 的关系</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B7%A5%E7%A8%8B%E6%94%B6%E7%9B%8A"><span class="post-toc-number">4.</span> <span class="post-toc-text">工程收益</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9E%E6%88%98%E5%BB%BA%E8%AE%AE"><span class="post-toc-number">5.</span> <span class="post-toc-text">实战建议</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="post-toc-number">6.</span> <span class="post-toc-text">小结</span></a></li></ol>
         </nav>
     </aside>
    
-<article id="post-qwen2-5-report-reading"
+<article id="post-gqa-grouped-query-attention"
   class="post-article article-type-post fade" itemprop="blogPost">
 
     <div class="post-card">
-        <h1 class="post-card-title">Qwen2.5 技术报告阅读笔记</h1>
+        <h1 class="post-card-title">GQA（Grouped Query Attention）技术拆解</h1>
         <div class="post-meta">
             <i class="icon icon-lg icon-calendar-o"></i>
             发表于
-            <time class="post-time" title="2026-03-03 21:00:00" datetime="2026-03-03T13:00:00.000Z"  itemprop="datePublished">2026-03-03</time>
+            <time class="post-time" title="2026-03-03 22:00:00" datetime="2026-03-03T14:00:00.000Z"  itemprop="datePublished">2026-03-03</time>
 
             <br id="mybreak"/>
             
 	<i class="icon icon-lg icon-folder-o"></i>
-	分类：<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a></li></ul>
+	分类：<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/">技术笔记</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%9E%B6%E6%9E%84%E6%8B%86%E8%A7%A3/">架构拆解</a></li></ul></li></ul>
 
 
             <i>·</i>
@@ -224,65 +224,35 @@
         </div>
         <div class="post-count-custom">
             <i class="icon icon-lg icon-comment-o"></i>
-            阅读本文可能花费您&nbsp;<span class="post-count">3</span>&nbsp;分钟
+            阅读本文可能花费您&nbsp;<span class="post-count">2</span>&nbsp;分钟
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
-            <p>这篇笔记记录我第一次系统阅读 <strong>Qwen2.5 Technical Report</strong> 的过程。</p>
-<h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><ul>
-<li>标题：<em>Qwen2.5 Technical Report</em></li>
-<li>链接：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2412.15115">arXiv:2412.15115</a></li>
-<li>我关注的问题：Qwen2.5  的训练过程和一些之前没注意到的细节</li>
-</ul>
-<h2 id="小小细节"><a href="#小小细节" class="headerlink" title="小小细节"></a>小小细节</h2><p>开源生态中 主要有 qwen 、llama 、mistral</p>
-<p>qwen 2.5 turbo plus 为 moe 架构</p>
-<p>数据集中在 知识变成和数学能力上。后训练有一百万的sft dpo grpo 都被使用到了</p>
-<h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><h3 id="dense-模型"><a href="#dense-模型" class="headerlink" title="dense 模型"></a>dense 模型</h3><ul>
-<li><a href="/2026/03/03/attention-overview/">Attention 全览</a></li>
-<li><a href="/2026/03/03/gqa-grouped-query-attention/">GQA</a></li>
-<li><a href="/2026/03/03/swiglu-activation-notes/">SwiGLU</a></li>
-<li><a href="/2026/03/03/rope-rotary-position-embedding/">RoPE</a></li>
-<li><a href="/2026/03/03/qkv-bias-notes/">QKV Bias</a></li>
-<li><a href="/2026/03/03/rmsnorm-notes/">RMSNorm</a></li>
-</ul>
-<p>在 dense 模型上，Qwen2.5 仍然保留了 Transformer-based 主干结构。这里不展开细节，分别拆成独立文章，便于后续持续补充。</p>
-<h3 id="Moe-模型"><a href="#Moe-模型" class="headerlink" title="Moe 模型"></a>Moe 模型</h3><ul>
-<li><a href="/2026/03/03/moe-token-routing-notes/">MoE Token 路由</a></li>
-</ul>
-<p>使用特殊的 MoE 层代替常规 FFN 层后，每个 token 不再激活全部专家，而是通过路由器选择少量专家参与计算。</p>
-<h3 id="token"><a href="#token" class="headerlink" title="token"></a>token</h3><ul>
-<li>在报告里，token 规模扩到更高量级，是能力提升的重要基础。</li>
-<li>控制 token 从 3 扩充到 22 后，工具调用与结构化能力也更容易做分工优化。</li>
-</ul>
-<h2 id="对齐训练流程"><a href="#对齐训练流程" class="headerlink" title="对齐训练流程"></a>对齐训练流程</h2><ul>
-<li><a href="/2026/03/03/sft-supervised-finetuning-notes/">SFT（监督微调）</a></li>
-<li><a href="/2026/03/03/dpo-direct-preference-optimization-notes/">DPO（直接偏好优化）</a></li>
-<li><a href="/2026/03/03/ppo-policy-optimization-notes/">PPO（策略优化）</a></li>
-</ul>
-<h2 id="最关键的三点更新"><a href="#最关键的三点更新" class="headerlink" title="最关键的三点更新"></a>最关键的三点更新</h2><ol>
-<li><strong>预训练规模继续放大</strong>：报告提到预训练 token 规模从约 <code>7T</code> 扩展到约 <code>18T</code>，数据覆盖和分布广度显著提升。</li>
-<li><strong>对齐数据与流程加强</strong>：指令数据规模扩展到百万级，并采用多阶段 SFT + 基于反馈的强化学习流程。</li>
-<li><strong>产品化分层更清晰</strong>：Max &#x2F; Turbo &#x2F; Plus 的定位区分明显，兼顾极致能力与推理成本。</li>
-</ol>
-<h2 id="训练与对齐流程理解"><a href="#训练与对齐流程理解" class="headerlink" title="训练与对齐流程理解"></a>训练与对齐流程理解</h2><p>我把这份报告里的训练路线压缩成一个四步框架：</p>
-<ol>
-<li>大规模预训练打底（知识与语言能力）</li>
-<li>高质量指令样本做监督微调（行为格式化）</li>
-<li>偏好数据驱动强化学习（回答风格与稳定性）</li>
-<li>面向不同产品形态做策略与效率平衡（Max&#x2F;Turbo&#x2F;Plus）</li>
-</ol>
-<p>这条路线的价值不在“某个单点技巧”，而在于把<strong>能力</strong>、<strong>可控性</strong>和<strong>服务成本</strong>放在同一体系里优化。</p>
-<h2 id="怎么读实验结论"><a href="#怎么读实验结论" class="headerlink" title="怎么读实验结论"></a>怎么读实验结论</h2><p>报告在摘要层面给了几个关键信号（以下为作者报告结果）：</p>
+            <p>这篇文章聚焦 GQA（Grouped Query Attention）的核心动机、实现方式和工程价值。</p>
+<h2 id="为什么会有-GQA"><a href="#为什么会有-GQA" class="headerlink" title="为什么会有 GQA"></a>为什么会有 GQA</h2><p>标准 Multi-Head Attention 在推理阶段需要缓存大量 KV，模型越大、上下文越长，KV Cache 压力越高。</p>
+<p>GQA 的核心目标是：在尽量少损失效果的前提下，降低 KV Cache 和带宽开销。</p>
+<h2 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h2><p>GQA 把多个 Query Head 共享到同一组 Key&#x2F;Value Head 上：</p>
 <ul>
-<li>Qwen2.5-Max 在公开基准上相较当时部分同规模或更大规模开源模型有竞争力。</li>
-<li>Qwen2.5-Turbo 与 Qwen2.5-Plus 分别对标不同成本档位，强调“性能&#x2F;延迟&#x2F;成本”的工程折中。</li>
+<li>Query 头数保持较高，维持表达能力</li>
+<li>Key&#x2F;Value 头数减少，降低缓存和访存开销</li>
 </ul>
-<p>我自己的阅读策略是：先看趋势和方法论，再在实测中验证“是否适合我的任务”，而不是只看单一榜单名次。</p>
-<h2 id="启发与后续计划"><a href="#启发与后续计划" class="headerlink" title="启发与后续计划"></a>启发与后续计划</h2><ol>
-<li>做模型评估时必须并行看三件事：能力上限、稳定性、单位成本。</li>
-<li>构建自己的“小型偏好数据集”很重要，能明显提升回答风格的一致性。</li>
-<li>下一步我会针对自己的中文技术写作任务，做一轮 Qwen2.5 与现有方案的 A&#x2F;B 对比。</li>
+<p>可以理解为：用更少的 K&#x2F;V “服务”更多的 Q。</p>
+<h2 id="与-MHA-MQA-的关系"><a href="#与-MHA-MQA-的关系" class="headerlink" title="与 MHA &#x2F; MQA 的关系"></a>与 MHA &#x2F; MQA 的关系</h2><ol>
+<li>MHA：每个 Q 头对应独立 K&#x2F;V 头，开销最大。</li>
+<li>MQA：所有 Q 头共享同一组 K&#x2F;V，开销最小但表达可能受限。</li>
+<li>GQA：介于两者之间，在效果与成本之间做折中。</li>
 </ol>
-<p>如果你也在做 LLM 工程化，建议从“任务目标 + 预算约束 + 可观测指标”这三点出发读报告，会更快抓住真正有用的信息。</p>
+<h2 id="工程收益"><a href="#工程收益" class="headerlink" title="工程收益"></a>工程收益</h2><p>常见收益方向：</p>
+<ul>
+<li>更小的 KV Cache 占用</li>
+<li>更低推理延迟（尤其长上下文）</li>
+<li>更高吞吐（服务侧更明显）</li>
+</ul>
+<h2 id="实战建议"><a href="#实战建议" class="headerlink" title="实战建议"></a>实战建议</h2><ol>
+<li>先在你的主任务集上做 A&#x2F;B，对比质量与吞吐。</li>
+<li>不只看平均指标，关注长上下文和高并发下表现。</li>
+<li>结合量化与缓存策略，GQA 的收益通常更明显。</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>GQA 不是“免费午餐”，但在大模型线上推理里往往是很实用的中间解法。</p>
 
         </div>
 
@@ -290,12 +260,12 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新：<time datetime="2026-03-03T10:34:13.037Z" itemprop="dateUpdated">2026-03-03 18:34:13</time>
+    最后更新：<time datetime="2026-03-03T08:58:34.251Z" itemprop="dateUpdated">2026-03-03 16:58:34</time>
 </span>
 
 
         
-        原文链接：<a href="/2026/03/03/qwen2-5-report-reading/" target="_blank" rel="external">https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/</a>
+        原文链接：<a href="/2026/03/03/gqa-grouped-query-attention/" target="_blank" rel="external">https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/</a>
         
     </div>
     <footer>
@@ -311,7 +281,7 @@
 
         <div class="post-footer">
             
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Qwen2-5/" rel="tag">Qwen2.5</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag">论文阅读</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Attention/" rel="tag">Attention</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GQA/" rel="tag">GQA</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLM/" rel="tag">LLM</a></li></ul>
 
 
             
@@ -321,7 +291,7 @@
 <div class="page-share" id="pageShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&pic=https://thumesn.github.io/img/avatar.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/&title=《GQA（Grouped Query Attention）技术拆解》 — thumesn 札记&pic=https://thumesn.github.io/img/avatar.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -331,22 +301,22 @@
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&source=记录学习、笔记与生活。" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/&title=《GQA（Grouped Query Attention）技术拆解》 — thumesn 札记&source=记录学习、笔记与生活。" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
       <li>
-        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Facebook">
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/" data-title=" Facebook">
           <i class="icon icon-facebook"></i>
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&via=https://thumesn.github.io" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《GQA（Grouped Query Attention）技术拆解》 — thumesn 札记&url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/&via=https://thumesn.github.io" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
       <li>
-        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Google+">
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/" data-title=" Google+">
           <i class="icon icon-google-plus"></i>
         </a>
       </li>
@@ -369,9 +339,9 @@
 <nav class="post-nav flex-row flex-justify-between">
   
     <div class="waves-block waves-effect prev">
-      <a href="/2026/03/03/gqa-grouped-query-attention/" id="post-prev" class="post-nav-link">
+      <a href="/2026/03/03/swiglu-activation-notes/" id="post-prev" class="post-nav-link">
         <h4 class="title" >
-          上一篇：GQA（Grouped Query Attention）技术拆解
+          上一篇：SwiGLU 激活函数笔记：为什么在大模型里常见
         </h4>
       </a>
     </div>
@@ -379,8 +349,8 @@
 
   
     <div class="waves-block waves-effect next">
-      <a href="/2026/03/02/hello-world/" id="post-next" class="post-nav-link">
-        <h4 class="title" data-hover="下一篇：博客迁移到 Tomotoes 主题">下一篇：博客迁移到 Tomotoes 主题</h4>
+      <a href="/2026/03/03/qwen2-5-report-reading/" id="post-next" class="post-nav-link">
+        <h4 class="title" data-hover="下一篇：Qwen2.5 技术报告阅读笔记">下一篇：Qwen2.5 技术报告阅读笔记</h4>
       </a>
     </div>
   
@@ -453,7 +423,7 @@
 <div class="global-share" id="globalShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&pic=https://thumesn.github.io/img/avatar.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/&title=《GQA（Grouped Query Attention）技术拆解》 — thumesn 札记&pic=https://thumesn.github.io/img/avatar.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -463,22 +433,22 @@
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&title=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&source=记录学习、笔记与生活。" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/&title=《GQA（Grouped Query Attention）技术拆解》 — thumesn 札记&source=记录学习、笔记与生活。" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
       <li>
-        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Facebook">
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/" data-title=" Facebook">
           <i class="icon icon-facebook"></i>
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Qwen2.5 技术报告阅读笔记》 — thumesn 札记&url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/&via=https://thumesn.github.io" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《GQA（Grouped Query Attention）技术拆解》 — thumesn 札记&url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/&via=https://thumesn.github.io" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
       <li>
-        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" data-title=" Google+">
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/" data-title=" Google+">
           <i class="icon icon-google-plus"></i>
         </a>
       </li>
@@ -489,7 +459,7 @@
 <div class="page-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p class="wechatshare">扫一扫，分享到微信</p>
-    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://thumesn.github.io/2026/03/03/qwen2-5-report-reading/" alt="微信分享二维码">
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://thumesn.github.io/2026/03/03/gqa-grouped-query-attention/" alt="微信分享二维码">
 </div>
 
 
