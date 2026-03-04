@@ -4,6 +4,7 @@ date: 2026-03-03 23:00:00
 categories:
   - 技术
   - LLM
+tags:
   - LLM
 ---
 
@@ -98,24 +99,66 @@ Multi-Head Attention（MHA）把注意力分成多个头并行计算。简单来
 
 ### MHA 有多费显存？
 
-假如输入序列长度为 $L$，模型维度为 $d_{model}$，每个头的维度为 $d_k$，头数为 $h$，则 MHA 的显存复杂度大致为：
-$$O(h \cdot L^2 \cdot d_k)
-$$
-其中 $L^2$ 来自于计算相关性分数的矩阵乘法，$h$ 来自于头数，$d_k$ 来自于每个头的维度。对于长上下文，$L^2$ 的增长会导致显存需求急剧增加，这也是为什么在长上下文场景下 MHA 会成为瓶颈的原因。
+简单直接的回答是：**在保持模型总维度（$d_{model}$）不变的前提下，多头注意力（MHA）相比单头注意力（SHA）在理论计算量（FLOPs）和参数量上几乎是一样的，但在实际工程中会有微小的额外显存和计算开销。**
 
-比起单头注意力，MHA 的显存需求增加了 $h$ 倍，因为每个头都需要独立计算相关性分数和加权求和。此外，MHA 还需要额外的线性层来生成多个 Q、K、V 组，这也会增加显存需求。
 
-单头注意力的显存复杂度为 $O(L^2 \cdot d_k)$，而 MHA 的显存复杂度为 $O(h \cdot L^2 \cdot d_k)$，因此 MHA 的显存需求是单头注意力的 $h$ 倍。
+#### 1. 前提：公平比较的标准
+为了公平比较，我们通常假设**模型的总表示维度 $d_{model}$ 保持不变**。
+*   **单头注意力 (SHA)**：1 个头，头的维度 $d_k = d_{model}$。
+*   **多头注意力 (MHA)**：$h$ 个头，每个头的维度 $d_k = d_{model} / h$。
+
+#### 2. 计算时间花费 (Computation Time / FLOPs)
+
+**理论计算量 (FLOPs)：基本相同**
+注意力机制的核心计算是 $Q \times K^T$ 和 $\text{Score} \times V$。
+*   **MHA**: $h \times (序列长度^2 \times d_k) = h \times (L^2 \times \frac{d_{model}}{h}) = L^2 \times d_{model}$
+*   **SHA**: $1 \times (序列长度^2 \times d_{model}) = L^2 \times d_{model}$
+**结论**：理论上浮点运算次数完全一致。
+
+**实际计算时间：MHA 有微小开销，但可能更快**
+*   **额外开销**：MHA 需要对张量进行 `split`（切分）、`transpose`（转置以交换头和序列维度）、`concat`（拼接）等操作。这些操作本身不产生大量计算，但会消耗少量的 GPU 内核启动时间和内存带宽。
+*   **并行优势**：GPU 擅长并行计算。MHA 将一个大矩阵乘法拆分成 $h$ 个小矩阵乘法，可以更好地利用 GPU 的流多处理器（SM）。在某些硬件配置下，MHA 甚至可能比单个巨大的矩阵乘法（SHA）效率更高，因为小矩阵更容易填满缓存。
+*   **总结**：时间开销差异通常在 **1% - 5%** 以内，往往可以忽略不计。
+
+#### 3. 显存花费 (VRAM)
+
+**参数量 (Weights)：完全相同**
+*   **MHA**: $h$ 组 $W_Q, W_K, W_V, W_O$，每组大小是 $(d_{model} \times \frac{d_{model}}{h})$。总参数量 $\approx 4 \times d_{model}^2$。
+*   **SHA**: 1 组 $W_Q, W_K, W_V, W_O$，大小是 $(d_{model} \times d_{model})$。总参数量 $\approx 4 \times d_{model}^2$。
+**结论**：模型权重占用的显存是一样的。
+
+**激活显存 (Activations)：MHA 略高**
+这是两者显存差异的主要来源，主要在于**注意力分数矩阵 (Attention Scores)** 的存储。
+*   在反向传播时，需要保存 Softmax 后的注意力矩阵用于计算梯度。
+*   **SHA**: 保存 1 个 $L \times L$ 的矩阵。
+*   **MHA**: 保存 $h$ 个 $L \times L$ 的矩阵（每个头一个）。
+*   **差异**：MHA 需要多存储 $(h-1) \times L^2$ 个浮点数。
+    *   当序列长度 $L$ 较短时，这部分显存可以忽略。
+    *   当序列长度 $L$ 很长（如长文本、高分辨率图像）时，这部分显存开销会变得明显。这也是为什么 **FlashAttention** 等优化技术如此重要，它们通过分块计算避免了完整存储这个 $L \times L$ 矩阵。
+
+
+#### 4. 总结对比表
+
+| 特性 | 单头注意力 (SHA) | 多头注意力 (MHA) | 对比结论 |
+| :--- | :--- | :--- | :--- |
+| **前提** | $d_{head} = d_{model}$ | $h \times d_{head} = d_{model}$ | 保持总容量一致 |
+| **参数量** | $4d_{model}^2$ | $4d_{model}^2$ | **相同** |
+| **理论 FLOPs** | $O(L^2 \cdot d_{model})$ | $O(L^2 \cdot d_{model})$ | **相同** |
+| **中间显存** | 1 个 $L \times L$ 注意力图 | $h$ 个 $L \times L$ 注意力图 | **MHA 多占 $(h-1)L^2$** |
+| **工程开销** | 无切分/拼接开销 | 有切分/转置/拼接开销 | **MHA 有微小开销** |
+| **并行效率** | 单个大矩阵乘 | 多个小矩阵乘并行 | **MHA 通常更优或持平** |
+| **表达能力** | 单一视角 | 多视角子空间 | **MHA 显著更强** |
+
 ## 3. 头部变体：MQA 与 GQA
 
 为降低推理成本，常见两种变体：
 
-1. MQA：所有 Query 头共享同一组 Key/Value，极省 KV 开销。
+1. MQA：所有 Query 头共享同一组 Key/Value，极省 KV 开销。MQA 提出来自于 Meta 的 [LLaMA 2](https://arxiv.org/abs/2302.13971)，在长上下文中表现不错，但在短文本任务上可能略逊于 MHA。
 2. GQA：多个 Query 头共享一组 Key/Value，在质量与成本间折中。
 
 详细拆解见：
 
-- [GQA（Grouped Query Attention）技术拆解](/2026/03/03/gqa-grouped-query-attention/)
+- [MQA、GQA（Grouped Query Attention）技术拆解](/2026/03/03/gqa-grouped-query-attention/)
 
 ## 4. 位置编码：为什么常用 RoPE
 
