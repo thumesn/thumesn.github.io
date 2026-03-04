@@ -10,6 +10,10 @@ tags:
 
 这篇文章作为 Attention 系列总览，目标是用一条主线串起常见机制：基础计算、头部变体、位置编码、缓存与工程加速。
 
+## 对应代码模块
+
+- [Attention 模块代码实现（PyTorch）](/2026/03/04/attention-module-pytorch/)
+
 ## 1. 注意力在算什么
 
 自注意力的核心是让每个 token 根据上下文动态聚合信息。标准形式是 Scaled Dot-Product Attention,原始论文来自《Attention Is All You Need》（Vaswani et al., 2017）
