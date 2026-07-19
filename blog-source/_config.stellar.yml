@@ -14,12 +14,12 @@ menubar:
       url: /
     - id: archives
       theme: '#2563eb'
-      icon: solar:archive-bold-duotone
+      icon: default:calendar
       title: 归档
       url: /archives/
     - id: categories
       theme: '#a16207'
-      icon: solar:folder-bold-duotone
+      icon: default:category
       title: 分类
       url: /categories/
     - id: tags
@@ -29,12 +29,12 @@ menubar:
       url: /tags/
     - id: about
       theme: '#7c3aed'
-      icon: solar:user-circle-bold-duotone
+      icon: solar:chat-square-like-bold-duotone
       title: 关于
       url: /about/
     - id: github
       theme: '#111827'
-      icon: solar:code-square-bold-duotone
+      icon: github:logo
       title: GitHub
       url: https://github.com/thumesn
 
