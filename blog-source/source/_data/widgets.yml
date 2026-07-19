@@ -1,0 +1,24 @@
+welcome:
+  layout: markdown
+  title: thumesn
+  content: |
+    系统化学习笔记、工程实践记录，以及阶段性复盘。
+
+recent:
+  layout: recent
+  rss: /atom.xml
+  limit: 8
+
+tagcloud:
+  layout: tagcloud
+  title: 标签云
+  amount: 80
+  color: false
+  show_count: true
+
+toc:
+  layout: toc
+  list_number: false
+  min_depth: 2
+  max_depth: 4
+  collapse: auto

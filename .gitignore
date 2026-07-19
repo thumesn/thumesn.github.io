@@ -1,5 +1,6 @@
-blog-source/*
-!blog-source/source/
-blog-source/source/*
-!blog-source/source/_posts/
-!blog-source/source/_posts/*.md
+blog-source/node_modules/
+blog-source/public/
+blog-source/db.json
+blog-source/.deploy_git/
+logs/runtime/
+.DS_Store

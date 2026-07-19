@@ -1,0 +1,157 @@
+######## Site Identity ########
+logo:
+  avatar: '[/img/avatar.jpg](/about/)'
+  title: '[thumesn 札记](/)'
+  subtitle: '学习笔记 | 工程实践'
+
+menubar:
+  columns: 4
+  items:
+    - id: post
+      theme: '#0f766e'
+      icon: solar:documents-bold-duotone
+      title: 博客
+      url: /
+    - id: archives
+      theme: '#2563eb'
+      icon: solar:archive-bold-duotone
+      title: 归档
+      url: /archives/
+    - id: categories
+      theme: '#a16207'
+      icon: solar:folder-bold-duotone
+      title: 分类
+      url: /categories/
+    - id: tags
+      theme: '#c24135'
+      icon: solar:hashtag-square-bold
+      title: 标签
+      url: /tags/
+    - id: about
+      theme: '#7c3aed'
+      icon: solar:user-circle-bold-duotone
+      title: 关于
+      url: /about/
+    - id: github
+      theme: '#111827'
+      icon: solar:code-square-bold-duotone
+      title: GitHub
+      url: https://github.com/thumesn
+
+site_tree:
+  home:
+    leftbar: welcome, recent
+    rightbar: tagcloud
+  index_blog:
+    base_dir: blog
+    menu_id: post
+    leftbar: welcome, recent
+    rightbar: tagcloud
+  post:
+    menu_id: post
+    leftbar: related, recent
+    rightbar: toc
+  page:
+    leftbar: welcome, recent
+    rightbar: toc
+  author:
+    base_dir: author
+    menu_id: post
+    leftbar: recent
+    rightbar: timeline
+  error_page:
+    menu_id: post
+    '404': '/404.html'
+    leftbar: recent
+    rightbar: timeline
+
+article:
+  type: tech
+  indent: false
+  auto_excerpt: 160
+  auto_banner: false
+  category_color:
+    技术: '#0f766e'
+    LLM: '#2563eb'
+    论文阅读: '#7c3aed'
+    站点: '#a16207'
+  license: '本文采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议，转载请注明出处。'
+  share:
+
+search:
+  service: local_search
+  local_search:
+    field: all
+    path: /search.json
+    content: true
+
+comments:
+  service:
+
+footer:
+  social:
+    github:
+      icon: '<img src="https://api.iconify.design/solar:code-square-bold-duotone.svg"/>'
+      url: https://github.com/thumesn
+    rss:
+      icon: '<img src="https://api.iconify.design/solar:rss-bold-duotone.svg"/>'
+      url: /atom.xml
+  sitemap:
+    - title: 内容
+      items:
+        - '[近期发布](/)'
+        - '[归档](/archives/)'
+        - '[分类](/categories/)'
+        - '[标签](/tags/)'
+    - title: 关于
+      items:
+        - '[关于我](/about/)'
+        - '[GitHub](https://github.com/thumesn)'
+  content: |
+    本站由 [{author.name}](/) 使用 [{theme.name} {theme.version}]({theme.tree}) 主题创建。
+    文章除特别声明外，采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议。
+
+style:
+  prefers_theme: auto
+  border-radius:
+    card: 8px
+    block: 8px
+    bar: 6px
+  font-size:
+    root: 16px
+    body: 17px
+  font-family:
+    body: '"Noto Serif SC", "Source Han Serif SC", "Songti SC", "PingFang SC", "Microsoft YaHei", serif'
+    code: '"JetBrains Mono", "SFMono-Regular", Consolas, monospace'
+  color:
+    common:
+      theme: '#0f766e'
+      accent: '#c24135'
+      link: '#0f766e'
+      button: '#0f766e'
+      hover: '#2563eb'
+    light:
+      site: '#f6f7f4'
+      card: 'rgba(255,255,255,0.94)'
+      block: '#eef3ef'
+    dark:
+      site: '#101418'
+      card: '#171d22'
+      block: '#20272d'
+  leftbar:
+    blur: true
+
+plugins:
+  preload:
+    enable: true
+  fancybox:
+    enable: true
+    selector: .md-text img:not([class]), .md-text .image img
+  scrollreveal:
+    enable: false
+  mathjax:
+    enable: true
+    v3: true
+    js: /js/mathjax/tex-svg.js
+  copycode:
+    enable: true

@@ -1,0 +1,66 @@
+:root {
+  --site-bg-grid: rgba(17, 24, 39, 0.055);
+  --site-ink: #1d2328;
+  --site-muted: #64706d;
+  --site-rule: rgba(29, 35, 40, 0.12);
+  --site-accent: #0f766e;
+  --site-warm: #a16207;
+}
+
+html,
+body {
+  letter-spacing: 0;
+}
+
+body {
+  background:
+    linear-gradient(90deg, var(--site-bg-grid) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(17, 24, 39, 0.04) 1px, transparent 1px),
+    var(--site-bg);
+  background-size: 42px 42px;
+}
+
+.l_left .leftbar-container {
+  border-right: 1px solid var(--site-rule);
+}
+
+.sidebar .logo-wrap .avatar,
+.logo-wrap .avatar {
+  box-shadow: 0 8px 22px rgba(15, 118, 110, 0.16);
+}
+
+.widget-wrapper,
+.post-list .post-card,
+.md-text pre,
+.md-text blockquote {
+  border-radius: 8px;
+}
+
+.post-list .post-card {
+  border: 1px solid var(--site-rule);
+}
+
+.post-list .post-card:hover {
+  transform: translateY(-2px);
+}
+
+.md-text h2 {
+  border-bottom: 1px solid var(--site-rule);
+  padding-bottom: 0.35rem;
+}
+
+.md-text h2::before {
+  color: var(--site-accent);
+}
+
+.md-text blockquote {
+  border-left: 4px solid var(--site-warm);
+}
+
+.md-text code {
+  border-radius: 6px;
+}
+
+.md-text pre code {
+  border-radius: 0;
+}

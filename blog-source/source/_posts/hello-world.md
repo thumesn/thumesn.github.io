@@ -1,5 +1,5 @@
 ---
-title: 博客迁移到 Tomotoes 主题
+title: 博客迁移到 Stellar 主题
 date: 2026-03-02 19:35:00
 categories:
   - 站点
@@ -7,16 +7,16 @@ categories:
 tags:
   - Hexo
   - Theme
-  - Tomotoes
+  - Stellar
 ---
 
 这篇文章是博客主题切换后的第一篇记录。
 
 ## 本次调整
 
-- 将博客前端切换为 `hexo-theme-tomotoes`
-- 完成 Hexo 7 兼容处理
-- 调整站点信息、菜单与页面结构
+- 将博客前端切换为 `hexo-theme-stellar`
+- 补齐可维护的 Hexo 源项目配置
+- 调整站点信息、菜单、侧边栏与页面结构
 
 ## 历史文章
 
@@ -26,4 +26,3 @@ tags:
 - [归档页](/archives/)
 
 后续会逐步把历史内容整理到新的 Hexo 源码结构中。
-

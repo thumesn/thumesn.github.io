@@ -17,33 +17,62 @@ tags:
 下面是一个标准的 Scaled Dot-Product Attention 模块，支持 mask。
 
 ```python
-import math
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+import math
+class ScaledDotProductAttention:
+  def __init__(self,dropout):
+      self.dropout = nn.Dropout(dropout)
+      super().__init__()
+  
+  def forward(
+    self,q,k,v,mask = None
+  ):
+  """
+    q:(batch_size,num_heads,seq_len,d_model)
+    k,v
+
+  """
+
+  scale = 1/math.sqrt(q.shape(-1)) # 长度
+  scores = torch.matmul(q,k.transpose(-2,-1)) *scale
+  # mask [B,1,L,L] 广播机制
+  # 按照最后一个维度softmax
+  # shape [B,H,L,L]
+  if mask is not None:
+    scores = scores.masked_fill(mask == 0,-1e9)
+  attn_weights = F.softmax(scores,dim = -1)
+  attn_weights = self.dropout(attn_weights)
+
+  output = torch.matmul(attn_weights,value)
+
+  return output,attn_weights
+
+class MultiHeadAttention(nn.Module):
+
+  def __init__(self,d_model,num_heads,dropout):
+    super().__init__()
+
+    assert d_model %num_heads ==0,"model 必须被整除"
+    self.d_model = d_model
+    self.num_heads = num_heads
+    self.d_k = d_k
 
 
-class ScaledDotProductAttention(nn.Module):
-    def __init__(self, dropout: float = 0.0):
-        super().__init__()
-        self.dropout = nn.Dropout(dropout)
+    self.W_q = nn.Linear(d_model,d_model)
+    self.W_k = nn.Linear(d_model,d_model)
+    self.W_v = nn.Linear(d_model,d_model)
+    self.W_o = nn.Linear(d_model,d_model)
 
-    def forward(self, q, k, v, mask=None):
-        """
-        q: (B, H, Lq, D)
-        k: (B, H, Lk, D)
-        v: (B, H, Lk, Dv)
-        mask: (B, 1, Lq, Lk) or broadcastable tensor, 1=keep, 0=mask
-        """
-        scale = 1.0 / math.sqrt(q.size(-1))
-        scores = torch.matmul(q, k.transpose(-2, -1)) * scale
+    self.attention = ScaleDotProductAttention(dropout=dropout)
 
-        if mask is not None:
-            scores = scores.masked_fill(mask == 0, float("-inf"))
+    self.dropout = nn.Dropout(dropout)
 
-        attn = torch.softmax(scores, dim=-1)
-        attn = self.dropout(attn)
-        out = torch.matmul(attn, v)
-        return out, attn
+
+def _split_heads(self,x):
+  """"""
+
 ```
 
 ## 快速测试
