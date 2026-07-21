@@ -9,16 +9,43 @@ usage() {
   cat <<'USAGE'
 Usage:
   scripts/post.sh list
-  scripts/post.sh new "文章标题"
+  scripts/post.sh new "文章标题" [专题目录]
   scripts/post.sh build
   scripts/post.sh server
 
 Commands:
   list    List editable post source files under blog-source/source/_posts
-  new     Create a new Hexo post source markdown
+  new     Create a new Hexo post source markdown. Example: scripts/post.sh new "文章标题" rl
   build   Generate static site into blog-source/public
   server  Run local preview server (http://localhost:4000)
 USAGE
+}
+
+topic_category() {
+  case "$1" in
+    llm) echo "LLM" ;;
+    rl) echo "强化学习" ;;
+    site) echo "站点" ;;
+    *) echo "$1" ;;
+  esac
+}
+
+slugify_title() {
+  local title="$1"
+  title="${title// /-}"
+  title="${title//\//-}"
+  title="${title//\\/-}"
+  title="${title//:/-}"
+  title="${title//：/-}"
+  title="${title//？/}"
+  title="${title//?/}"
+  title="${title//！/}"
+  title="${title//!/}"
+  title="${title//,/}"
+  title="${title//，/}"
+  title="${title//./}"
+  title="${title//。/}"
+  echo "$title"
 }
 
 if [[ ! -d "$BLOG_SRC" ]]; then
@@ -29,16 +56,54 @@ fi
 cmd="${1:-}"
 case "$cmd" in
   list)
-    ls -1 "$POST_DIR"
+    find "$POST_DIR" -type f -name '*.md' | sort | while IFS= read -r file; do
+      rel="${file#"$POST_DIR"/}"
+      title="$(sed -n 's/^title:[[:space:]]*//p' "$file" | head -n 1)"
+      if [[ -n "$title" ]]; then
+        printf '%-56s %s\n' "$rel" "$title"
+      else
+        printf '%s\n' "$rel"
+      fi
+    done
     ;;
   new)
     shift || true
     title="${1:-}"
+    topic="${2:-}"
     if [[ -z "$title" ]]; then
-      echo "Error: title is required. Example: scripts/post.sh new \"Qwen2.5 阅读\"" >&2
+      echo "Error: title is required. Example: scripts/post.sh new \"Qwen2.5 阅读\" llm" >&2
       exit 1
     fi
-    (cd "$BLOG_SRC" && npm run new -- "$title")
+    if [[ -z "$topic" ]]; then
+      (cd "$BLOG_SRC" && npm run new -- "$title")
+    else
+      if [[ "$topic" = /* || "$topic" = *..* ]]; then
+        echo "Error: topic must be a simple relative directory name, such as llm or rl." >&2
+        exit 1
+      fi
+      topic_dir="$POST_DIR/$topic"
+      mkdir -p "$topic_dir"
+      slug="$(slugify_title "$title")"
+      post_file="$topic_dir/$slug.md"
+      if [[ -e "$post_file" ]]; then
+        echo "Error: post already exists: $post_file" >&2
+        exit 1
+      fi
+      category="$(topic_category "$topic")"
+      {
+        echo "---"
+        echo "title: $title"
+        echo "date: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "categories:"
+        echo "  - 技术"
+        echo "  - $category"
+        echo "tags:"
+        echo "  - $category"
+        echo "---"
+        echo
+      } > "$post_file"
+      echo "Created: $post_file"
+    fi
     ;;
   build)
     (cd "$BLOG_SRC" && npm run build)

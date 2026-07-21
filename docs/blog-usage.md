@@ -12,11 +12,36 @@
 blog-source/source/_posts/
 ```
 
+现在文章按专题放子目录，常用目录是：
+
+```text
+blog-source/source/_posts/llm/
+blog-source/source/_posts/rl/
+blog-source/source/_posts/site/
+```
+
+这些子目录只用于编辑时分类；站点链接仍按文件名生成，不需要手动改 URL。
+
 新建文章：
 
 ```bash
 scripts/post.sh new "文章标题"
 ```
+
+新建到某个专题目录：
+
+```bash
+scripts/post.sh new "文章标题" rl
+scripts/post.sh new "文章标题" llm
+```
+
+查看所有文章：
+
+```bash
+scripts/post.sh list
+```
+
+输出会显示相对路径和文章标题，方便从专题目录里找文件。
 
 本地构建：
 
@@ -41,7 +66,9 @@ scripts/post.sh server
 文章写在：
 
 ```text
-_posts/
+_posts/rl/
+_posts/llm/
+_posts/site/
 ```
 
 图片统一放在：
