@@ -2,19 +2,20 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-DEBOUNCE_SECONDS=3
-POLL_SECONDS=2
+CHECK_SECONDS=600
 DO_PUSH=0
 
 usage() {
   cat <<'USAGE'
 Usage:
-  scripts/blog-autocommit.sh [--push] [--debounce SECONDS] [--poll SECONDS]
+  scripts/blog-autocommit.sh [--push] [--interval SECONDS]
 
-Watch blog source files and automatically commit after saves.
+Check blog source files on a timer and commit when there are changes.
 
 By default this commits locally only. Add --push if you also want every save
-to publish to GitHub Pages.
+batch to publish to GitHub Pages.
+
+Default interval: 600 seconds.
 USAGE
 }
 
@@ -24,12 +25,8 @@ while [[ $# -gt 0 ]]; do
       DO_PUSH=1
       shift
       ;;
-    --debounce)
-      DEBOUNCE_SECONDS="${2:-3}"
-      shift 2
-      ;;
-    --poll)
-      POLL_SECONDS="${2:-2}"
+    --interval|--poll)
+      CHECK_SECONDS="${2:-600}"
       shift 2
       ;;
     -h|--help)
@@ -45,6 +42,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 cd "$ROOT_DIR"
+
+if ! [[ "$CHECK_SECONDS" =~ ^[0-9]+$ ]] || [[ "$CHECK_SECONDS" -lt 1 ]]; then
+  echo "Error: interval must be a positive integer number of seconds." >&2
+  exit 1
+fi
 
 watched_paths=(
   blog-source/source
@@ -63,37 +65,22 @@ publish_once() {
   fi
 }
 
-state_hash() {
-  find "${watched_paths[@]}" -type f \
-    ! -path '*/node_modules/*' \
-    -printf '%T@ %s %p\n' 2>/dev/null \
-    | sort \
-    | sha256sum \
-    | awk '{print $1}'
+has_blog_changes() {
+  [[ -n "$(git status --porcelain -- "${watched_paths[@]}")" ]]
 }
 
-echo "Watching blog source files. Press Ctrl-C to stop."
+echo "Checking blog source files every $CHECK_SECONDS seconds. Press Ctrl-C to stop."
 if [[ "$DO_PUSH" -eq 1 ]]; then
-  echo "Mode: auto commit and push."
+  echo "Mode: auto commit and push changed batches."
 else
-  echo "Mode: auto commit locally. Run scripts/blog-publish.sh later to push."
+  echo "Mode: auto commit changed batches locally. Run scripts/blog-publish.sh later to push."
 fi
 
-if command -v inotifywait >/dev/null 2>&1; then
-  while true; do
-    inotifywait -r -e close_write,create,delete,move "${watched_paths[@]}" >/dev/null 2>&1 || true
-    sleep "$DEBOUNCE_SECONDS"
+while true; do
+  sleep "$CHECK_SECONDS"
+  if has_blog_changes; then
     publish_once
-  done
-else
-  last_hash="$(state_hash)"
-  while true; do
-    sleep "$POLL_SECONDS"
-    next_hash="$(state_hash)"
-    if [[ "$next_hash" != "$last_hash" ]]; then
-      sleep "$DEBOUNCE_SECONDS"
-      last_hash="$(state_hash)"
-      publish_once
-    fi
-  done
-fi
+  else
+    echo "No blog source changes: $(date '+%Y-%m-%d %H:%M:%S')"
+  fi
+done

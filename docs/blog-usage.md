@@ -130,23 +130,29 @@ scripts/install-blog-hooks.sh
 
 这能避免“只提交了 Markdown，忘记提交生成后的 HTML”的问题。
 
-## 保存后自动提交
+## 定时自动提交
 
-Git hook 不会在保存文件时触发。要实现“每次保存自动提交”，需要运行文件监听脚本：
+Git hook 不会在保存文件时触发。需要自动提交时，可以运行定时检查脚本：
 
 ```bash
 scripts/blog-autocommit.sh
 ```
 
-默认模式只会自动本地提交，不会自动推送。这样适合写作时频繁保存，避免每次保存都触发 GitHub Pages 部署。
+默认每 10 分钟检查一次 `blog-source/source/` 和博客配置文件；如果有改动，就构建并提交一次。默认只会自动本地提交，不会自动推送。
 
-如果你确实希望每次保存后都提交并推送：
+如果希望每 10 分钟自动提交并推送到 GitHub Pages：
 
 ```bash
 scripts/blog-autocommit.sh --push
 ```
 
-建议只在短时间集中写作时开启自动提交，写完后按 `Ctrl-C` 停止。
+如果想改检查间隔，比如每 30 分钟检查一次：
+
+```bash
+scripts/blog-autocommit.sh --push --interval 1800
+```
+
+写作时可以一直保存，脚本只会在检查点把一批改动合并成一个提交。写完后按 `Ctrl-C` 停止。
 
 ## 推荐日常流程
 
@@ -162,11 +168,11 @@ scripts/blog-publish.sh -m "add: 文章标题"
 如果正在连续写作：
 
 ```bash
-scripts/blog-autocommit.sh
+scripts/blog-autocommit.sh --push
 ```
 
-写完确认没问题后：
+也可以不用自动提交，写完后手动发布：
 
 ```bash
-git push origin master
+scripts/blog-publish.sh -m "add: 文章标题"
 ```
