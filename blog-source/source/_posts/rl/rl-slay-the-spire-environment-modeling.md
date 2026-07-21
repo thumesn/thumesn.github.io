@@ -257,3 +257,127 @@ def double_dqn_target(online, target, batch):
 
 
 ```
+
+对应实验中最后保留下来的主要参数如下：
+
+```python
+config = {
+    # 环境：先固定在一个足够小的问题上，避免先被全量杀戮尖塔的状态空间淹没。
+    "encounter": "FIXED_SLIMES_WEAK",
+    "deck": "Ironclad starter deck",
+    "observation_mode": "abs_hp_legacy",
+    "obs_dim": 155,
+
+    # reward：不再做最大战损归一化，当前回合真实损失多少 HP 就扣多少。
+    # 额外给一个很小的 step penalty，避免无意义拖长战斗。
+    "reward": "-step_hp_loss - 0.01",
+
+    # 动作：只对当前 legal candidates 打分，而不是输出固定 115 维动作头。
+    "action_encoding": "card_ref_effect_v1",
+    "action_feature_dim": 32,
+    "max_candidates": 32,
+
+    # 网络。
+    "state_encoder": "semantic_pool",
+    "hidden_dim": 256,
+    "action_hidden_dim": 128,
+
+    # DQN/DDQN。
+    "gamma": 0.999,
+    "batch_size": 128,
+    "replay_capacity": 200_000,
+    "learning_rate": 3e-4,
+    "learning_starts": 1_000,
+    "train_every": 4,
+    "target_update_every": 500,
+
+    # 探索。这里后面发现 replay 太小和 epsilon 下降太快都会让策略卡在次优动作上。
+    "num_envs": 32,
+    "epsilon_start": 0.3,
+    "epsilon_end": 0.05,
+    "epsilon_decay_steps": 100_000,
+
+    # 后续有效的关键补丁：用搜索挖出来的同状态 better/worse action pair 做 ranking loss。
+    "counterfactual_loss_weight": 1.0,
+    "counterfactual_margin": 1.0,
+}
+```
+
+为了避免只是在一个参数上碰运气，中间做过的测试大致如下：
+
+```python
+experiments = [
+    {
+        "name": "PPO + token transformer + card relation prior",
+        "setup": {
+            "gamma": 0.99,
+            "gae_lambda": 0.95,
+            "reward_mode": "step",
+            "encounter_pool": "weak",
+        },
+        "result": "mean_hp_loss 约 3.92，max_hp_loss 17，能赢但细节决策差",
+    },
+    {
+        "name": "固定动作头 DQN",
+        "setup": "直接输出固定 115 个动作 Q",
+        "result": "动作和手牌槽/目标槽绑定太重，迁移性差，放弃",
+    },
+    {
+        "name": "candidate-action DQN",
+        "setup": "输入 obs + legal candidate action feature，输出 Q(s, legal_action)",
+        "result": "成为后续主线",
+    },
+    {
+        "name": "动作编码消融",
+        "tested": ["slot_hash_v1", "semantic_effect_v1", "semantic_effect_v2", "card_ref_effect_v1"],
+        "result": "semantic effect 容易描述出当前不存在的卡牌组合，最后改成引用真实手牌槽的 card_ref_effect_v1",
+    },
+    {
+        "name": "observation 消融",
+        "tested": ["143-dim legacy", "155-dim abs_hp_legacy", "455-dim pile-slot detailed"],
+        "result": "155 维最稳定；455 维完整牌堆槽位反而更难收敛，mean_hp_loss 约 3.12，max 17",
+    },
+    {
+        "name": "gamma 消融",
+        "tested": [0.9, 0.999, 1.0],
+        "result": "0.9 延迟信用不足，1.0 价值不稳定且容易拖长，0.999 最稳",
+    },
+    {
+        "name": "reward 消融",
+        "tested": [
+            "按战损 reward",
+            "hp loss 归到对应损失回合",
+            "战损绝对值：损失 6 HP 就 reward -= 6",
+            "每步 -0.01",
+            "搜索成功奖励/失败惩罚",
+            "过度防御惩罚",
+        ],
+        "result": "最后保留 -step_hp_loss - 0.01，不再直接绑定搜索 baseline",
+    },
+    {
+        "name": "探索与 replay",
+        "tested": ["replay 扩到 200k", "epsilon decay 拉长", "32 env 并行采样"],
+        "result": "有帮助，但单靠探索仍然不能稳定解决细粒度动作排序",
+    },
+    {
+        "name": "TD(lambda) / GAE-like 回传",
+        "tested": [0.0, 0.5, 0.9, 1.0],
+        "result": "没有解决问题，说明核心瓶颈不是简单的多步回传长度",
+    },
+    {
+        "name": "turn-level / oracle search",
+        "fix": "搜索必须累计每一步 hp_loss，不能用 start_hp - final_hp，否则 Ironclad 战后回血会掩盖真实战损",
+        "result": "oracle mean_hp_loss = 0.1523，max_hp_loss = 11；所以当前 max 11 不是策略 bug",
+    },
+    {
+        "name": "counterfactual ranking loss",
+        "method": "沿当前 policy 轨迹挖状态，对同一状态枚举动作，用搜索生成 better/worse action pair",
+        "result": "最终 best mean_hp_loss = 0.3711，max_hp_loss = 11，policy_gap_mean = 0.21875，policy_gap_max = 2",
+    },
+]
+```
+
+从这些实验里得到的结论是：普通 DQN 能学到大方向，但在这种环境里，真正困难的是同一个状态下几个合法动作之间的细粒度排序。这个排序信号如果只从 rollout 的 bootstrap TD target 里来，会非常稀疏且噪声很大；用搜索生成同状态的反事实排序样本之后，训练才明显接近搜索结果。
+
+反事实训练的相关算法
+
