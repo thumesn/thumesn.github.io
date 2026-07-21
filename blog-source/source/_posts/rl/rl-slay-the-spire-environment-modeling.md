@@ -503,3 +503,9 @@ def enumerate_turn_outcomes(env, base_hp_loss, base_trajectory):
 这里是东西做完的补充，所以会有点简略。
 
 
+## 结果对比
+
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01-1.png" alt="图 1：RL 解决杀戮尖塔（一）：大致回忆研究过程">
+  <figcaption>图 1：RL 解决杀戮尖塔（一）：大致回忆研究过程</figcaption>
+</figure>
