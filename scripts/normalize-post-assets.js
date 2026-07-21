@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const rootDir = path.resolve(__dirname, '..');
+const sourceRoot = path.join(rootDir, 'blog-source', 'source');
 const postDir = path.join(rootDir, 'blog-source', 'source', '_posts');
 const assetRoot = path.join(rootDir, 'blog-source', 'source', 'img', 'posts');
 const imageExts = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg']);
@@ -38,6 +39,34 @@ function shortHash(value) {
   return crypto.createHash('sha1').update(value).digest('hex').slice(0, 8);
 }
 
+function slugifyAscii(value, fallback = 'post') {
+  const base = value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+
+  return base || fallback;
+}
+
+function postSlug(postFile) {
+  const rel = path.relative(postDir, postFile);
+  return slugifyAscii(path.basename(postFile, path.extname(postFile)), `post-${shortHash(rel)}`);
+}
+
+function postTitle(postFile) {
+  const content = fs.readFileSync(postFile, 'utf8');
+  const match = content.match(/^title:\s*(.+)$/m);
+  return match ? match[1].trim().replace(/^['"]|['"]$/g, '') : path.basename(postFile, path.extname(postFile));
+}
+
+function figAssetName(postFile, fallbackName, index) {
+  const ext = path.extname(fallbackName).toLowerCase();
+  return `${postSlug(postFile)}-fig-${String(index).padStart(2, '0')}${ext}`;
+}
+
 function safeAssetName(sourceFile, fallbackName) {
   const ext = path.extname(fallbackName).toLowerCase();
   const rawBase = path.basename(fallbackName, path.extname(fallbackName));
@@ -59,6 +88,10 @@ function safeAssetName(sourceFile, fallbackName) {
 
 function isRemoteOrAbsolute(ref) {
   return /^(https?:)?\/\//i.test(ref) || ref.startsWith('/') || ref.startsWith('#') || ref.startsWith('mailto:');
+}
+
+function isExternalRef(ref) {
+  return /^(https?:)?\/\//i.test(ref) || ref.startsWith('#') || ref.startsWith('mailto:');
 }
 
 function filesEqual(a, b) {
@@ -88,27 +121,32 @@ function assetDirForPost(postFile) {
 }
 
 function publicUrlForAsset(assetFile) {
-  const rel = path.relative(path.join(rootDir, 'blog-source', 'source'), assetFile).split(path.sep).join('/');
+  const rel = path.relative(sourceRoot, assetFile).split(path.sep).join('/');
   return encodeURI(`/${rel}`);
 }
 
-function resolveAndMoveAsset(postFile, ref) {
+function resolveAndMoveAsset(postFile, ref, imageIndex) {
   let rawRef = ref.trim();
   if (rawRef.startsWith('<') && rawRef.endsWith('>')) {
     rawRef = rawRef.slice(1, -1).trim();
   }
 
   const cleanRef = safeDecode(rawRef.split(/[?#]/)[0]);
-  if (!cleanRef || isRemoteOrAbsolute(cleanRef) || !hasImageExt(cleanRef)) {
+  if (!cleanRef || isExternalRef(cleanRef) || !hasImageExt(cleanRef)) {
     return null;
   }
 
   const postAssetDir = assetDirForPost(postFile);
-  const sourceCandidate = path.resolve(path.dirname(postFile), cleanRef);
-  const filename = safeAssetName(sourceCandidate, path.basename(cleanRef));
+  const sourceCandidate = cleanRef.startsWith('/')
+    ? path.resolve(sourceRoot, cleanRef.slice(1))
+    : path.resolve(path.dirname(postFile), cleanRef);
+  const filename = figAssetName(postFile, path.basename(cleanRef), imageIndex);
   const targetCandidate = path.join(postAssetDir, filename);
 
-  if (!sourceCandidate.startsWith(postDir + path.sep) && sourceCandidate !== targetCandidate) {
+  const sourceIsAllowed = sourceCandidate.startsWith(postDir + path.sep)
+    || sourceCandidate.startsWith(assetRoot + path.sep)
+    || sourceCandidate === targetCandidate;
+  if (!sourceIsAllowed) {
     return null;
   }
 
@@ -137,11 +175,30 @@ function resolveAndMoveAsset(postFile, ref) {
   return null;
 }
 
+function isWeakAlt(alt, ref) {
+  const value = alt.trim();
+  if (!value) return true;
+
+  const normalized = value.toLowerCase();
+  if (['image', 'img', 'alt', 'alt text', 'screenshot', 'paste image', 'pasted image'].includes(normalized)) {
+    return true;
+  }
+
+  const refBase = path.basename(safeDecode(ref).split(/[?#]/)[0], path.extname(ref)).trim().toLowerCase();
+  return normalized === refBase || /^pasted image\s*\d*$/i.test(value) || /^image\s*\d*$/i.test(value);
+}
+
+function figureAlt(title, imageIndex) {
+  return `图 ${imageIndex}：${title}`;
+}
+
 function normalizePost(postFile) {
   const original = fs.readFileSync(postFile, 'utf8');
   const lines = original.split(/(\r?\n)/);
   let inFence = false;
   let changed = false;
+  let imageIndex = 0;
+  const title = postTitle(postFile);
 
   for (let i = 0; i < lines.length; i += 2) {
     let line = lines[i];
@@ -154,18 +211,21 @@ function normalizePost(postFile) {
     line = line.replace(/!\[\[([^\]\n]+)\]\]/g, (match, inner) => {
       const [refPart, altPart] = inner.split('|');
       const ref = refPart.trim();
-      const nextUrl = resolveAndMoveAsset(postFile, ref);
+      imageIndex += 1;
+      const nextUrl = resolveAndMoveAsset(postFile, ref, imageIndex);
       if (!nextUrl) return match;
       changed = true;
-      const alt = (altPart || path.basename(ref, path.extname(ref))).trim() || 'image';
+      const providedAlt = (altPart || '').trim();
+      const alt = isWeakAlt(providedAlt, ref) ? figureAlt(title, imageIndex) : providedAlt;
       return `![${alt}](${nextUrl})`;
     });
 
     line = line.replace(/!\[([^\]\n]*)\]\(([^)\n]+)\)/g, (match, alt, ref) => {
-      const nextUrl = resolveAndMoveAsset(postFile, ref);
+      imageIndex += 1;
+      const nextUrl = resolveAndMoveAsset(postFile, ref, imageIndex);
       if (!nextUrl) return match;
       changed = true;
-      const nextAlt = alt.trim() || path.basename(safeDecode(ref), path.extname(ref)).trim() || 'image';
+      const nextAlt = isWeakAlt(alt, ref) ? figureAlt(title, imageIndex) : alt.trim();
       return `![${nextAlt}](${nextUrl})`;
     });
 
