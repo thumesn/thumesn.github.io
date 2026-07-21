@@ -27,6 +27,11 @@ menubar:
       icon: solar:hashtag-square-bold
       title: 标签
       url: /tags/
+    - id: rl-sts
+      theme: '#0891b2'
+      icon: solar:planet-bold-duotone
+      title: RL 尖塔
+      url: /categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/%E6%9D%80%E6%88%AE%E5%B0%96%E5%A1%94/
     - id: about
       theme: '#7c3aed'
       icon: solar:chat-square-like-bold-duotone
@@ -72,6 +77,8 @@ article:
   auto_banner: false
   category_color:
     技术: '#0f766e'
+    强化学习: '#0891b2'
+    杀戮尖塔: '#be123c'
     LLM: '#2563eb'
     论文阅读: '#7c3aed'
     站点: '#a16207'

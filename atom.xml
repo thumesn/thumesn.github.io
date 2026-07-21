@@ -6,7 +6,7 @@
   <link href="https://thumesn.github.io/atom.xml" rel="self"/>
   
   <link href="https://thumesn.github.io/"/>
-  <updated>2026-03-04T06:56:49.852Z</updated>
+  <updated>2026-07-20T12:18:16.767Z</updated>
   <id>https://thumesn.github.io/</id>
   
   <author>
@@ -15,6 +15,114 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>RL 解决杀戮尖塔（一）：环境建模从状态、动作和奖励开始</title>
+    <link href="https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/"/>
+    <id>https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/</id>
+    <published>2026-07-20T12:18:00.000Z</published>
+    <updated>2026-07-20T12:18:16.767Z</updated>
+    
+    <content type="html"><![CDATA[<p>这篇是 “RL 解决杀戮尖塔” 专题的第一篇，先不急着上 PPO，也不急着写神经网络。第一步应该是把游戏抽象成一个强化学习环境：agent 看见什么，能做什么，做完之后环境怎么反馈。</p><p>如果这一步做错，后面的算法再复杂也救不回来。强化学习里很多训练失败，看起来像是策略网络不够强，实际是环境定义不稳定。</p><h2 id="最小问题定义"><a href="#最小问题定义" class="headerlink" title="最小问题定义"></a>最小问题定义</h2><p>一个 RL 环境通常可以写成这样的形式：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">obs = env.reset()<br><span class="hljs-keyword">while</span> <span class="hljs-keyword">not</span> done:<br>    action = agent.act(obs)<br>    next_obs, reward, done, info = env.step(action)<br>    obs = next_obs<br></code></pre></td></tr></table></figure><p>把《杀戮尖塔》塞进这个接口时，最先遇到的问题是：游戏不是单一阶段。它至少有战斗、选牌、事件、商店、地图路线、遗物选择等不同场景。</p><p>所以我倾向于先做一个分阶段环境，而不是一开始就把所有动作混在一起。</p><h2 id="第一阶段只做战斗"><a href="#第一阶段只做战斗" class="headerlink" title="第一阶段只做战斗"></a>第一阶段只做战斗</h2><p>完整爬塔太大，第一阶段可以只做战斗环境。也就是固定初始牌组、固定敌人池，先让 agent 学会在战斗中打合法牌。</p><p>这个阶段的状态可以包含：</p><ol><li>玩家血量、格挡、能量</li><li>手牌、抽牌堆、弃牌堆</li><li>敌人血量、格挡、意图</li><li>当前回合数</li><li>可执行动作 mask</li></ol><p>先不追求信息完美。只要状态足够支持一个简单策略，就可以开始跑 baseline。</p><h2 id="状态表示"><a href="#状态表示" class="headerlink" title="状态表示"></a>状态表示</h2><p>状态表示需要在“完整”和“可训练”之间折中。</p><p>如果直接把所有游戏对象都塞进去，模型输入会很乱。卡牌有名称、费用、伤害、格挡、效果、升级状态；敌人有意图、buff、debuff；遗物又会改变规则。信息太多时，模型不一定学得更好，调试还会更痛苦。</p><p>我会先使用结构化向量：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text">player_features:<br>  hp<br>  max_hp<br>  block<br>  energy<br><br>enemy_features:<br>  hp<br>  block<br>  intent_type<br>  intent_value<br><br>card_features:<br>  card_id<br>  cost<br>  type<br>  damage<br>  block<br>  playable<br></code></pre></td></tr></table></figure><p>这里的重点是保持稳定。每个字段的含义、范围和归一化方式都要固定，否则训练曲线很难解释。</p><h2 id="动作空间"><a href="#动作空间" class="headerlink" title="动作空间"></a>动作空间</h2><p>战斗动作看起来简单：打牌或结束回合。但实际要处理几个细节：</p><ul><li>有些牌需要选择目标</li><li>有些牌因为能量不够不能打</li><li>有些牌当前没有合法目标</li><li>一回合可以连续打多张牌</li><li>结束回合也是一个动作</li></ul><p>一个可用的动作设计是：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">action = &#123;<br>  action_type: play_card | end_turn<br>  card_index: 手牌位置<br>  target_index: 敌人位置<br>&#125;<br></code></pre></td></tr></table></figure><p>然后用 action mask 屏蔽非法动作。这样 agent 不需要自己试错大量无效动作，训练会稳定很多。</p><h2 id="Reward-先保持克制"><a href="#Reward-先保持克制" class="headerlink" title="Reward 先保持克制"></a>Reward 先保持克制</h2><p>第一版 reward 不应该太花。可以先这样设：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">胜利：+1<br>失败：-1<br>每场战斗损失生命：小幅惩罚<br>每回合造成伤害：小幅奖励<br>非法动作：强惩罚，或直接 mask 掉<br></code></pre></td></tr></table></figure><p>这里最危险的是过度 reward shaping。比如给“造成伤害”太高的奖励，agent 可能只学会莽伤害，不管防御和长期生命值。给“保留血量”太高的奖励，它又可能过度防守。</p><p>所以第一阶段我会先用简单 reward 跑通，再逐步观察策略行为，而不是一开始就把所有直觉都塞进奖励函数。</p><h2 id="Episode-怎么结束"><a href="#Episode-怎么结束" class="headerlink" title="Episode 怎么结束"></a>Episode 怎么结束</h2><p>战斗阶段的 episode 结束条件很明确：</p><ol><li>敌人全部死亡，胜利</li><li>玩家生命值归零，失败</li><li>回合数超过上限，判定失败或截断</li></ol><p>第三条很重要。如果没有回合上限，某些 bug 可能导致训练卡住。比如 agent 一直结束回合，或者敌我双方都无法结束战斗。</p><h2 id="第一批-baseline"><a href="#第一批-baseline" class="headerlink" title="第一批 baseline"></a>第一批 baseline</h2><p>在训练模型前，我会先写三个 baseline：</p><ol><li>随机合法动作</li><li>优先打出所有能打攻击牌</li><li>简单防御策略：敌人要攻击时优先堆格挡</li></ol><p>这些 baseline 不需要聪明，它们的作用是校验环境。如果随机策略都能异常高胜率，可能 reward 或敌人逻辑有 bug。如果简单启发式策略跑不过随机策略，动作编码或评估脚本就要重点检查。</p><h2 id="当前实现顺序"><a href="#当前实现顺序" class="headerlink" title="当前实现顺序"></a>当前实现顺序</h2><p>我准备按这个顺序推进：</p><ol><li>先实现一个简化战斗环境</li><li>写 action mask 和随机合法动作 baseline</li><li>加入启发式 baseline</li><li>记录胜率、平均回合数、平均损血</li><li>再接 PPO 训练</li></ol><p>这个顺序比较慢，但能减少后期返工。强化学习项目一旦环境和评估没打牢，后面每次实验失败都不知道该怪算法、参数，还是环境本身。</p><h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>RL 解决杀戮尖塔的第一步，不是训练一个大模型，而是定义一个可靠环境。对这个项目来说，状态、动作、reward、episode 结束条件和 baseline 是第一层地基。</p><p>下一篇我会继续拆动作空间，重点记录 action mask、组合动作和非法动作处理。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;这篇是 “RL 解决杀戮尖塔” 专题的第一篇，先不急着上 PPO，也不急着写神经网络。第一步应该是把游戏抽象成一个强化学习环境：agent</summary>
+        
+      
+    
+    
+    
+    <category term="技术" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="强化学习" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/"/>
+    
+    <category term="杀戮尖塔" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/%E6%9D%80%E6%88%AE%E5%B0%96%E5%A1%94/"/>
+    
+    
+    <category term="Reinforcement Learning" scheme="https://thumesn.github.io/tags/Reinforcement-Learning/"/>
+    
+    <category term="RL" scheme="https://thumesn.github.io/tags/RL/"/>
+    
+    <category term="Slay the Spire" scheme="https://thumesn.github.io/tags/Slay-the-Spire/"/>
+    
+    <category term="Game AI" scheme="https://thumesn.github.io/tags/Game-AI/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RL 解决杀戮尖塔专题：从规则环境到可训练 Agent</title>
+    <link href="https://thumesn.github.io/2026/07/20/rl-slay-the-spire-series/"/>
+    <id>https://thumesn.github.io/2026/07/20/rl-slay-the-spire-series/</id>
+    <published>2026-07-20T12:16:21.000Z</published>
+    <updated>2026-07-20T12:18:16.767Z</updated>
+    
+    <content type="html"><![CDATA[<p>这个专题记录一个长期实验：用强化学习去训练一个能玩《杀戮尖塔》的 agent。它不会从一开始就追求“通关”，而是先把问题拆小：环境怎么建模，动作空间怎么压缩，reward 怎么设计，baseline 怎么评估，再逐步推进到策略学习和搜索结合。</p><p>我更想把它写成一组可复盘的工程记录，而不是一篇一次性教程。强化学习项目最容易卡住的地方，往往不是 PPO、DQN 或 Actor-Critic 的公式，而是环境接口、状态表示、非法动作、随机性和评估方式。</p><h2 id="为什么选择杀戮尖塔"><a href="#为什么选择杀戮尖塔" class="headerlink" title="为什么选择杀戮尖塔"></a>为什么选择杀戮尖塔</h2><p>《杀戮尖塔》适合拿来做 RL 实验，因为它同时具备几个有意思的特征：</p><ol><li><strong>状态空间大</strong>：卡组、遗物、血量、敌人意图、药水、路线都会影响决策。</li><li><strong>动作有强约束</strong>：战斗中不是所有牌都能打，地图上不是所有路线都能走。</li><li><strong>长期收益明显</strong>：一张牌当前很强，不代表它适合后续卡组。</li><li><strong>随机性很强</strong>：抽牌、奖励、事件、敌人组合都会改变策略价值。</li></ol><p>这些特征让它比 CartPole 这类入门环境复杂很多，但又比完全开放世界更可控。对学习 RL 来说，它是一个足够折磨、也足够具体的中间项目。</p><h2 id="专题路线"><a href="#专题路线" class="headerlink" title="专题路线"></a>专题路线</h2><p>我准备按下面的顺序写：</p><h3 id="1-环境建模"><a href="#1-环境建模" class="headerlink" title="1. 环境建模"></a>1. 环境建模</h3><p>第一步是把游戏拆成 RL 能理解的问题：什么是 state，什么是 action，什么时候 episode 结束，以及哪些信息应该进入 observation。</p><ul><li>当前文章：<a href="/2026/07/20/rl-slay-the-spire-environment-modeling/">环境建模：先把游戏拆成状态、动作和奖励</a></li></ul><h3 id="2-动作空间压缩"><a href="#2-动作空间压缩" class="headerlink" title="2. 动作空间压缩"></a>2. 动作空间压缩</h3><p>原始动作空间会非常麻烦。战斗时可以出牌、选择目标、结束回合；奖励时可以选牌、跳过、拿遗物；地图时还要选路线。后续需要把这些动作统一成一个可管理的接口。</p><p>我会重点记录三件事：</p><ol><li>如何表达非法动作 mask</li><li>如何把组合动作拆成多步决策</li><li>如何避免 agent 学到“卡死流程”的行为</li></ol><h3 id="3-Reward-设计"><a href="#3-Reward-设计" class="headerlink" title="3. Reward 设计"></a>3. Reward 设计</h3><p>如果只在通关时给 reward，训练会非常稀疏。如果每一步都给太多 shaping reward，agent 又可能学到短视行为。这个专题会从最粗的胜负 reward 开始，再逐步加入血量、战斗损失、卡组质量等中间信号。</p><h3 id="4-Baseline-与评估"><a href="#4-Baseline-与评估" class="headerlink" title="4. Baseline 与评估"></a>4. Baseline 与评估</h3><p>在训练复杂 agent 前，需要先写一些简单 baseline：</p><ol><li>随机合法动作</li><li>简单启发式策略</li><li>固定选牌规则</li></ol><p>没有 baseline，训练曲线很容易自我感动。一个模型看起来 reward 上升，不代表它真的学会了游戏，也可能只是避开了某些会扣分的动作。</p><h3 id="5-策略学习"><a href="#5-策略学习" class="headerlink" title="5. 策略学习"></a>5. 策略学习</h3><p>等环境和评估稳定后，再考虑算法。初期我会优先试 PPO，因为它适合离散动作和复杂策略；后面再看能否加入 value-based 方法、模仿学习或搜索。</p><h3 id="6-搜索与规划"><a href="#6-搜索与规划" class="headerlink" title="6. 搜索与规划"></a>6. 搜索与规划</h3><p>杀戮尖塔的很多决策带有规划性质。比如当前战斗怎么打，路线怎么选，卡组未来怎么成型。纯 RL 可能不够稳，后续可以考虑把策略网络和搜索结合起来。</p><h2 id="这个专题会记录什么"><a href="#这个专题会记录什么" class="headerlink" title="这个专题会记录什么"></a>这个专题会记录什么</h2><p>我会重点记录可复现的东西：</p><ul><li>环境接口怎么设计</li><li>observation 和 action 怎么编码</li><li>reward 为什么这么设</li><li>训练曲线怎么看</li><li>哪些实验失败了</li><li>哪些 bug 会让模型学歪</li></ul><p>如果只写成功结果，这个专题就没有太大价值。RL 项目的真实经验通常藏在失败里：reward 设错、动作 mask 漏了、评估脚本不一致、训练随机种子导致结论反复变化。</p><h2 id="当前判断"><a href="#当前判断" class="headerlink" title="当前判断"></a>当前判断</h2><p>这个项目的核心难点不是“用哪个算法”，而是先把游戏变成一个稳定、可评估、可迭代的学习环境。算法可以换，但环境抽象一旦混乱，后续实验都会变成噪声。</p><p>所以第一阶段目标很明确：先做一个小而硬的环境接口，让 agent 能在受限场景里完成合法决策。等这个地基稳定，再谈完整爬塔。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;这个专题记录一个长期实验：用强化学习去训练一个能玩《杀戮尖塔》的 agent。它不会从一开始就追求“通关”，而是先把问题拆小：环境怎么建模，动作空间怎么压缩，reward 怎么设计，baseline</summary>
+        
+      
+    
+    
+    
+    <category term="技术" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="强化学习" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/"/>
+    
+    <category term="杀戮尖塔" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/%E6%9D%80%E6%88%AE%E5%B0%96%E5%A1%94/"/>
+    
+    
+    <category term="Reinforcement Learning" scheme="https://thumesn.github.io/tags/Reinforcement-Learning/"/>
+    
+    <category term="RL" scheme="https://thumesn.github.io/tags/RL/"/>
+    
+    <category term="Slay the Spire" scheme="https://thumesn.github.io/tags/Slay-the-Spire/"/>
+    
+    <category term="Game AI" scheme="https://thumesn.github.io/tags/Game-AI/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>强化学习折腾记录</title>
+    <link href="https://thumesn.github.io/2026/07/19/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/"/>
+    <id>https://thumesn.github.io/2026/07/19/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/</id>
+    <published>2026-07-19T13:47:48.000Z</published>
+    <updated>2026-07-19T13:48:38.705Z</updated>
+    
+    <content type="html"><![CDATA[<p>这篇文章用来记录我最近折腾强化学习时遇到的问题、临时结论和后续实验方向。它不是一篇完整教程，更像是一份持续更新的实验日志：先把概念跑通，再慢慢补代码、曲线和复盘。</p><h2 id="为什么开始折腾强化学习"><a href="#为什么开始折腾强化学习" class="headerlink" title="为什么开始折腾强化学习"></a>为什么开始折腾强化学习</h2><p>强化学习和普通监督学习最大的差异在于：模型不是直接拟合一组标准答案，而是在环境反馈里学习策略。这个设定很有吸引力，因为它更接近“做决策”的问题。</p><p>我目前最关心的是三件事：</p><ol><li>agent 怎么根据状态选择动作</li><li>reward 设计如何影响学习方向</li><li>训练过程为什么容易不稳定</li></ol><h2 id="当前理解"><a href="#当前理解" class="headerlink" title="当前理解"></a>当前理解</h2><p>一个最小强化学习问题通常包含几个部分：</p><ul><li><strong>状态（state）</strong>：环境当前给 agent 的信息</li><li><strong>动作（action）</strong>：agent 可以选择的行为</li><li><strong>奖励（reward）</strong>：环境对动作结果的反馈</li><li><strong>策略（policy）</strong>：从状态到动作的选择规则</li><li><strong>价值函数（value function）</strong>：估计当前状态或动作的长期收益</li></ul><p>如果只看公式，强化学习很容易显得抽象；但实际做实验时，最先卡住的通常不是公式，而是环境接口、reward 尺度、随机种子和训练曲线解释。</p><h2 id="第一轮踩坑"><a href="#第一轮踩坑" class="headerlink" title="第一轮踩坑"></a>第一轮踩坑</h2><h3 id="reward-不一定越大越好"><a href="#reward-不一定越大越好" class="headerlink" title="reward 不一定越大越好"></a>reward 不一定越大越好</h3><p>刚开始最容易犯的错误是把 reward 当成一个简单分数。实际训练里，reward 的尺度、稀疏程度和噪声都会改变学习难度。</p><p>如果 reward 太稀疏，agent 很久都拿不到有效反馈；如果 reward 设计得太密，agent 又可能学到投机行为。</p><h3 id="曲线震荡不一定代表完全失败"><a href="#曲线震荡不一定代表完全失败" class="headerlink" title="曲线震荡不一定代表完全失败"></a>曲线震荡不一定代表完全失败</h3><p>强化学习训练曲线经常比监督学习难看。回报上下波动、某些阶段突然退化，都可能出现。</p><p>所以观察时不能只看单次 episode 的 reward，而要看滑动平均、成功率、策略行为是否真的变好。</p><h3 id="环境比算法更容易出问题"><a href="#环境比算法更容易出问题" class="headerlink" title="环境比算法更容易出问题"></a>环境比算法更容易出问题</h3><p>实验一开始，我更想研究 PPO、DQN 这些算法。但实际跑起来后发现，环境 wrapper、观测空间、动作空间、终止条件这些细节更容易埋坑。</p><h2 id="接下来想做的实验"><a href="#接下来想做的实验" class="headerlink" title="接下来想做的实验"></a>接下来想做的实验</h2><p>短期目标是先把一个小环境完整跑通：</p><ol><li>选择一个简单环境，例如 CartPole 或 MountainCar</li><li>固定随机种子，记录 baseline 曲线</li><li>分别尝试 DQN 和 PPO</li><li>对比 reward 归一化、学习率和 batch size 的影响</li><li>保存训练日志和关键超参数</li></ol><h2 id="目前的判断"><a href="#目前的判断" class="headerlink" title="目前的判断"></a>目前的判断</h2><p>强化学习最难的地方不是“算法名字多”，而是每一次实验都要同时处理算法、环境和评估。只看最终 reward 很容易误判，后面需要把实验记录做细一点。</p><p>下一步我会先从一个最小可复现实验开始，把代码、训练曲线和失败样例都放进这篇记录里。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;这篇文章用来记录我最近折腾强化学习时遇到的问题、临时结论和后续实验方向。它不是一篇完整教程，更像是一份持续更新的实验日志：先把概念跑通，再慢慢补代码、曲线和复盘。&lt;/p&gt;
+&lt;h2 id=&quot;为什么开始折腾强化学习&quot;&gt;&lt;a href=&quot;#为什么开始折腾强化学习&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="技术" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="强化学习" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+    <category term="Reinforcement Learning" scheme="https://thumesn.github.io/tags/Reinforcement-Learning/"/>
+    
+    <category term="RL" scheme="https://thumesn.github.io/tags/RL/"/>
+    
+    <category term="PPO" scheme="https://thumesn.github.io/tags/PPO/"/>
+    
+  </entry>
   
   <entry>
     <title>Attention 模块代码实现（PyTorch）</title>
