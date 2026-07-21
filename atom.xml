@@ -6,7 +6,7 @@
   <link href="https://thumesn.github.io/atom.xml" rel="self"/>
   
   <link href="https://thumesn.github.io/"/>
-  <updated>2026-07-21T08:53:12.686Z</updated>
+  <updated>2026-07-21T11:41:05.115Z</updated>
   <id>https://thumesn.github.io/</id>
   
   <author>
@@ -15,39 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Skills 解读</title>
-    <link href="https://thumesn.github.io/2026/07/21/skills-problem-solving-and-learning/"/>
-    <id>https://thumesn.github.io/2026/07/21/skills-problem-solving-and-learning/</id>
-    <published>2026-07-21T08:50:00.000Z</published>
-    <updated>2026-07-21T08:53:12.686Z</updated>
-    
-    <content type="html"><![CDATA[<p>专题用来解读其他skills 是怎么写的 包括自己写的过程中遇到的问题<br><a href="/2026/07/21/shuorenhua/">说人话: 远离ai味</a></p>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;专题用来解读其他skills 是怎么写的 包括自己写的过程中遇到的问题&lt;br&gt;&lt;a href=&quot;/2026/07/21/shuorenhua/&quot;&gt;说人话:</summary>
-        
-      
-    
-    
-    
-    <category term="技术" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
-    
-    <category term="Skills" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/Skills/"/>
-    
-    
-    <category term="Skills" scheme="https://thumesn.github.io/tags/Skills/"/>
-    
-    <category term="学习方法" scheme="https://thumesn.github.io/tags/%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"/>
-    
-    <category term="问题解决" scheme="https://thumesn.github.io/tags/%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"/>
-    
-  </entry>
   
   <entry>
     <title>说人话: 远离ai味</title>
@@ -84,13 +51,46 @@
   </entry>
   
   <entry>
+    <title>Skills 解读</title>
+    <link href="https://thumesn.github.io/2026/07/21/skills-problem-solving-and-learning/"/>
+    <id>https://thumesn.github.io/2026/07/21/skills-problem-solving-and-learning/</id>
+    <published>2026-07-21T08:50:00.000Z</published>
+    <updated>2026-07-21T08:53:12.686Z</updated>
+    
+    <content type="html"><![CDATA[<p>专题用来解读其他skills 是怎么写的 包括自己写的过程中遇到的问题<br><a href="/2026/07/21/shuorenhua/">说人话: 远离ai味</a></p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;专题用来解读其他skills 是怎么写的 包括自己写的过程中遇到的问题&lt;br&gt;&lt;a href=&quot;/2026/07/21/shuorenhua/&quot;&gt;说人话:</summary>
+        
+      
+    
+    
+    
+    <category term="技术" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="Skills" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/Skills/"/>
+    
+    
+    <category term="Skills" scheme="https://thumesn.github.io/tags/Skills/"/>
+    
+    <category term="学习方法" scheme="https://thumesn.github.io/tags/%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"/>
+    
+    <category term="问题解决" scheme="https://thumesn.github.io/tags/%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"/>
+    
+  </entry>
+  
+  <entry>
     <title>RL 解决杀戮尖塔（一）</title>
     <link href="https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/"/>
     <id>https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/</id>
     <published>2026-07-20T12:18:00.000Z</published>
-    <updated>2026-07-21T11:44:55.844Z</updated>
+    <updated>2026-07-21T11:55:05.428Z</updated>
     
-    <content type="html"><![CDATA[<p>这篇是 “RL 解决杀戮尖塔” 专题的第一篇，也是强化学习真正开始折腾的第一个工作。</p><h2 id="起点：环境"><a href="#起点：环境" class="headerlink" title="起点：环境"></a>起点：环境</h2><p>第一步先找一个合理的强化学习环境，这里就选择上网找了一个一般用于杀戮尖塔的环境<a href="https://github.com/zhiyue/sts2-rl-agent">https://github.com/zhiyue/sts2-rl-agent</a></p><p>但是存在的问题是，环境的做法是直接对照效果写的，会有很多隐藏问题，包括版本不够新。于是选择用dll 反编译+和原始环境对照，重点是对照随机数的设计等部分。这里首先只对齐了 seed 0 -100 选择随机合理的选项。很多分歧，修复到目前为止，没有必要完全实现 相同的环境，目的能够达到就可以。速度方面，和游戏dll 通信大致时间为<br><img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01.png" alt="图 1：RL 解决杀戮尖塔（一）"></p><p>一开始的想法大概是直接利用生成的反编译C# 但是发现C#本身速度也很慢，于是还是选择 dll 对照+python 环境后续训练中会避免太复杂的困难的问题。然后直接使用默认的编码+PPO 开始训练。</p><p>环境的细节说明：</p><p> [0:10]    玩家状态<br>  [10:60]   手牌，10 个槽位 * 5<br>  [60:66]   牌堆摘要<br>  [66:131]  敌人，5 个槽位 * 13</p><p>  玩家状态 10 维</p><p>  0  current_hp &#x2F; max_hp<br>  1  block &#x2F; 50<br>  2  energy &#x2F; 10<br>  3  max_energy &#x2F; 10<br>  4  strength &#x2F; 20<br>  5  dexterity &#x2F; 20<br>  6  vulnerable &#x2F; 20<br>  7  weak &#x2F; 20<br>  8  frail &#x2F; 20<br>  9  artifact &#x2F; 20</p><p>  每个手牌槽 5 维</p><p>  card_id_norm<br>  cost &#x2F; 5<br>  base_damage &#x2F; 50<br>  base_block &#x2F; 50<br>  is_attack</p><p>  一共 10 个槽，不存在的槽全 0。</p><p>  牌堆摘要 6 维</p><p>  draw_pile_size &#x2F; 20<br>  discard_pile_size &#x2F; 20<br>  exhaust_pile_size &#x2F; 20<br>  0<br>  0<br>  0</p><p>  注意这里没有具体牌堆内容，也没有抽牌概率，只是数量。</p><p>  每个敌人槽 13 维</p><p>  is_alive<br>  current_hp &#x2F; max_hp<br>  block &#x2F; 50<br>  intent_attack<br>  intent_multi_attack<br>  intent_defend<br>  intent_buff<br>  intent_debuff<br>  intent_damage &#x2F; 30<br>  intent_hits &#x2F; 5<br>  vulnerable &#x2F; 10<br>  weak &#x2F; 10<br>  strength &#x2F; 10</p><p>  一共最多 5 个敌人槽，不存在的槽全 0。</p><h2 id="初始环节："><a href="#初始环节：" class="headerlink" title="初始环节："></a>初始环节：</h2><h2 id="第一阶段只做战斗"><a href="#第一阶段只做战斗" class="headerlink" title="第一阶段只做战斗"></a>第一阶段只做战斗</h2><p>完整爬塔太大，第一阶段可以只做战斗环境。也就是固定初始牌组、固定敌人池，先让 agent 学会在战斗中打合法牌。</p><p>这个阶段的状态可以包含：</p><ol><li>玩家血量、格挡、能量</li><li>手牌、抽牌堆、弃牌堆</li><li>敌人血量、格挡、意图</li><li>当前回合数</li><li>可执行动作 mask</li></ol><p>先不追求信息完美。只要状态足够支持一个简单策略，就可以开始跑 baseline。</p><h2 id="状态表示"><a href="#状态表示" class="headerlink" title="状态表示"></a>状态表示</h2><p>状态表示需要在“完整”和“可训练”之间折中。</p><p>如果直接把所有游戏对象都塞进去，模型输入会很乱。卡牌有名称、费用、伤害、格挡、效果、升级状态；敌人有意图、buff、debuff；遗物又会改变规则。信息太多时，模型不一定学得更好，调试还会更痛苦。</p><p>我会先使用结构化向量：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text">player_features:<br>  hp<br>  max_hp<br>  block<br>  energy<br><br>enemy_features:<br>  hp<br>  block<br>  intent_type<br>  intent_value<br><br>card_features:<br>  card_id<br>  cost<br>  type<br>  damage<br>  block<br>  playable<br></code></pre></td></tr></table></figure><p>这里的重点是保持稳定。每个字段的含义、范围和归一化方式都要固定，否则训练曲线很难解释。</p><h2 id="动作空间"><a href="#动作空间" class="headerlink" title="动作空间"></a>动作空间</h2><p>战斗动作看起来简单：打牌或结束回合。但实际要处理几个细节：</p><ul><li>有些牌需要选择目标</li><li>有些牌因为能量不够不能打</li><li>有些牌当前没有合法目标</li><li>一回合可以连续打多张牌</li><li>结束回合也是一个动作</li></ul><p>一个可用的动作设计是：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">action = &#123;<br>  action_type: play_card | end_turn<br>  card_index: 手牌位置<br>  target_index: 敌人位置<br>&#125;<br></code></pre></td></tr></table></figure><p>然后用 action mask 屏蔽非法动作。这样 agent 不需要自己试错大量无效动作，训练会稳定很多。</p><h2 id="Reward-先保持克制"><a href="#Reward-先保持克制" class="headerlink" title="Reward 先保持克制"></a>Reward 先保持克制</h2><p>第一版 reward 不应该太花。可以先这样设：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">胜利：+1<br>失败：-1<br>每场战斗损失生命：小幅惩罚<br>每回合造成伤害：小幅奖励<br>非法动作：强惩罚，或直接 mask 掉<br></code></pre></td></tr></table></figure><p>这里最危险的是过度 reward shaping。比如给“造成伤害”太高的奖励，agent 可能只学会莽伤害，不管防御和长期生命值。给“保留血量”太高的奖励，它又可能过度防守。</p><p>所以第一阶段我会先用简单 reward 跑通，再逐步观察策略行为，而不是一开始就把所有直觉都塞进奖励函数。</p><h2 id="Episode-怎么结束"><a href="#Episode-怎么结束" class="headerlink" title="Episode 怎么结束"></a>Episode 怎么结束</h2><p>战斗阶段的 episode 结束条件很明确：</p><ol><li>敌人全部死亡，胜利</li><li>玩家生命值归零，失败</li><li>回合数超过上限，判定失败或截断</li></ol><p>第三条很重要。如果没有回合上限，某些 bug 可能导致训练卡住。比如 agent 一直结束回合，或者敌我双方都无法结束战斗。</p><h2 id="第一批-baseline"><a href="#第一批-baseline" class="headerlink" title="第一批 baseline"></a>第一批 baseline</h2><p>在训练模型前，我会先写三个 baseline：</p><ol><li>随机合法动作</li><li>优先打出所有能打攻击牌</li><li>简单防御策略：敌人要攻击时优先堆格挡</li></ol><p>这些 baseline 不需要聪明，它们的作用是校验环境。如果随机策略都能异常高胜率，可能 reward 或敌人逻辑有 bug。如果简单启发式策略跑不过随机策略，动作编码或评估脚本就要重点检查。</p><h2 id="当前实现顺序"><a href="#当前实现顺序" class="headerlink" title="当前实现顺序"></a>当前实现顺序</h2><p>我准备按这个顺序推进：</p><ol><li>先实现一个简化战斗环境</li><li>写 action mask 和随机合法动作 baseline</li><li>加入启发式 baseline</li><li>记录胜率、平均回合数、平均损血</li><li>再接 PPO 训练</li></ol><p>这个顺序比较慢，但能减少后期返工。强化学习项目一旦环境和评估没打牢，后面每次实验失败都不知道该怪算法、参数，还是环境本身。</p><h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>RL 解决杀戮尖塔的第一步，不是训练一个大模型，而是定义一个可靠环境。对这个项目来说，状态、动作、reward、episode 结束条件和 baseline 是第一层地基。</p><p>下一篇我会继续拆动作空间，重点记录 action mask、组合动作和非法动作处理。</p>]]></content>
+    <content type="html"><![CDATA[<p>这篇是 “RL 解决杀戮尖塔” 专题的第一篇，也是强化学习真正开始折腾的第一个工作。</p><h2 id="起点：环境"><a href="#起点：环境" class="headerlink" title="起点：环境"></a>起点：环境</h2><p>第一步先找一个合理的强化学习环境，这里就选择上网找了一个一般用于杀戮尖塔的环境<a href="https://github.com/zhiyue/sts2-rl-agent">https://github.com/zhiyue/sts2-rl-agent</a></p><p>但是存在的问题是，环境的做法是直接对照效果写的，会有很多隐藏问题，包括版本不够新。于是选择用dll 反编译+和原始环境对照，重点是对照随机数的设计等部分。这里首先只对齐了 seed 0 -100 选择随机合理的选项。很多分歧，修复到目前为止，没有必要完全实现 相同的环境，目的能够达到就可以。速度方面，和游戏dll 通信大致时间为<br><img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01.png" alt="图 1：RL 解决杀戮尖塔（一）"></p><p>一开始的想法大概是直接利用生成的反编译C# 但是发现C#本身速度也很慢，于是还是选择 dll 对照+python 环境后续训练中会避免太复杂的困难的问题。然后直接使用默认的编码+PPO 开始训练。</p><p>环境的细节说明：</p><p> [0:10]    玩家状态<br>  [10:60]   手牌，10 个槽位 * 5<br>  [60:66]   牌堆摘要<br>  [66:131]  敌人，5 个槽位 * 13</p><p>  玩家状态 10 维</p><p>  0  current_hp &#x2F; max_hp<br>  1  block &#x2F; 50<br>  2  energy &#x2F; 10<br>  3  max_energy &#x2F; 10<br>  4  strength &#x2F; 20<br>  5  dexterity &#x2F; 20<br>  6  vulnerable &#x2F; 20<br>  7  weak &#x2F; 20<br>  8  frail &#x2F; 20<br>  9  artifact &#x2F; 20</p><p>  每个手牌槽 5 维</p><p>  card_id_norm<br>  cost &#x2F; 5<br>  base_damage &#x2F; 50<br>  base_block &#x2F; 50<br>  is_attack</p><p>  一共 10 个槽，不存在的槽全 0。</p><p>  牌堆摘要 6 维</p><p>  draw_pile_size &#x2F; 20<br>  discard_pile_size &#x2F; 20<br>  exhaust_pile_size &#x2F; 20<br>  0<br>  0<br>  0</p><p>  注意这里没有具体牌堆内容，也没有抽牌概率，只是数量。</p><p>  每个敌人槽 13 维</p><p>  is_alive<br>  current_hp &#x2F; max_hp<br>  block &#x2F; 50<br>  intent_attack<br>  intent_multi_attack<br>  intent_defend<br>  intent_buff<br>  intent_debuff<br>  intent_damage &#x2F; 30<br>  intent_hits &#x2F; 5<br>  vulnerable &#x2F; 10<br>  weak &#x2F; 10<br>  strength &#x2F; 10</p><p>  一共最多 5 个敌人槽，不存在的槽全 0。</p><h2 id="初始环节：痴心妄想"><a href="#初始环节：痴心妄想" class="headerlink" title="初始环节：痴心妄想"></a>初始环节：痴心妄想</h2><p>既然有环境了 直接上ppo 开始训练 先直接训练战斗 ppo + transformer encoder + 弱怪池<br>输入</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python">player_features:        [B, <span class="hljs-number">20</span>]<br><br>state_card_ids:         [B, <span class="hljs-number">70</span>]<br>state_card_features:    [B, <span class="hljs-number">70</span>, <span class="hljs-number">16</span>]<br>state_card_mask:        [B, <span class="hljs-number">70</span>]<br>state_card_zones:       [B, <span class="hljs-number">70</span>]<br>state_card_positions:   [B, <span class="hljs-number">70</span>]<br><br>enemy_ids:              [B, <span class="hljs-number">5</span>]<br>enemy_features:         [B, <span class="hljs-number">5</span>, <span class="hljs-number">18</span>]<br>enemy_mask:             [B, <span class="hljs-number">5</span>]<br><br>action_card_ids:        [B, <span class="hljs-number">115</span>]<br>action_target_enemy_ids:[B, <span class="hljs-number">115</span>]<br>action_target_slots:    [B, <span class="hljs-number">115</span>]<br>action_target_mask:     [B, <span class="hljs-number">115</span>]<br>action_features:        [B, <span class="hljs-number">115</span>, <span class="hljs-number">34</span>]<br>action_mask:            [B, <span class="hljs-number">115</span>]<br></code></pre></td></tr></table></figure><p>或者采用 attention 添加几个编码器，或者分层强化学习等结论：</p><p><img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-02.png" alt="图 2：RL 解决杀戮尖塔（一）"></p><p>相比于搜索算法平均只有3左右的战损（弱怪初始卡） rl 无论怎么训练都是4左右 而且分布不合理，详细分析轨迹，甚至学不会 bash-&gt; strike </p><p>经过很多次调整 这里就不记录初始阶段很多实验了。先确认这是一个不简单的问题，然后从环境和算法重新开始叙述。</p><h2 id="算法选择"><a href="#算法选择" class="headerlink" title="算法选择"></a>算法选择</h2><p>因为问题本身其实包含了不确定性 所以还是从 弱怪池 初始卡组开始。离散动作 最自然的算法是 dual-dqn（TODO）</p>]]></content>
     
     
       
