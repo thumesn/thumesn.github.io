@@ -377,7 +377,110 @@ experiments = [
 ]
 ```
 
-从这些实验里得到的结论是：普通 DQN 能学到大方向，但在这种环境里，真正困难的是同一个状态下几个合法动作之间的细粒度排序。这个排序信号如果只从 rollout 的 bootstrap TD target 里来，会非常稀疏且噪声很大；用搜索生成同状态的反事实排序样本之后，训练才明显接近搜索结果。
+搜索算法在这里不是为了在线控制，而是作为一个小环境里的 oracle baseline：给定一个 deterministic seed，把这一局的战斗搜索到尽量低的总战损，然后用它判断 RL 策略到底差在哪里。
 
-反事实训练的相关算法
+```python
+def search_one_episode(seed, config):
+    """Turn-level pruned search。
 
+    目标：minimize total_hp_loss。
+
+    注意这里累计的是每一步真实 hp_loss，而不是 start_hp - final_hp。
+    如果用 start_hp - final_hp，Ironclad 战后回血会把真实战损抹掉，搜索结果会偏乐观。
+    """
+    env = reset_env(seed)
+
+    # priority queue 里的 cost 就是当前累计战损。
+    queue = PriorityQueue()
+    queue.push(cost=0, env=env, trajectory=[])
+
+    # best_cost 用 canonical state key 去重：同一个状态只保留更低战损路径。
+    best_cost = {state_key(env): 0}
+    best_terminal = None
+
+    while queue and not hit_expansion_limit():
+        cost, env, trajectory = queue.pop_min_cost()
+
+        if best_terminal is not None and cost >= best_terminal.cost:
+            continue
+        if cost > best_cost.get(state_key(env), float("inf")):
+            continue
+        if env.done:
+            if env.won:
+                best_terminal = min_by_cost(best_terminal, (cost, env, trajectory))
+            continue
+
+        # 核心：不是一层层展开 primitive action，而是枚举“本回合结束后的状态”。
+        # 一个 turn outcome 可以包含若干次打牌，最后以 end_turn 或战斗结束收尾。
+        turn_outcomes = enumerate_turn_outcomes(env, base_hp_loss=cost, base_trajectory=trajectory)
+
+        # 每回合只保留评分靠前的一批 outcome，控制搜索规模。
+        for child_cost, child_env, child_trajectory in topk(turn_outcomes, config.turn_beam_width):
+            if best_terminal is not None and child_cost >= best_terminal.cost:
+                continue
+
+            key = state_key(child_env)
+            if child_cost >= best_cost.get(key, float("inf")):
+                continue
+
+            best_cost[key] = child_cost
+            queue.push(cost=child_cost, env=child_env, trajectory=child_trajectory)
+
+    return best_terminal
+
+
+def enumerate_turn_outcomes(env, base_hp_loss, base_trajectory):
+    """枚举从当前状态开始，本回合所有有意义的动作序列。"""
+    stack = [(copy(env), base_hp_loss, base_trajectory)]
+    outcomes = []
+    seen_inside_turn = set()
+
+    while stack and len(outcomes) < TURN_MAX_SEQUENCES:
+        current, hp_loss, trajectory = stack.pop()
+
+        # 回合内去重，避免同一状态由等价动作顺序反复到达。
+        key = state_key(current)
+        if key in seen_inside_turn:
+            continue
+        seen_inside_turn.add(key)
+
+        if current.done:
+            outcomes.append((hp_loss, current, trajectory))
+            continue
+
+        actions = legal_actions(current)
+        actions = dedupe_equivalent_actions(current, actions)
+        actions = sort_by_card_priority(current, actions)
+        actions = actions[:MAX_ACTIONS_PER_NODE]
+
+        # 早停剪枝：如果还有攻击牌可打，或者当前已经没有受伤威胁，通常不展开过早 end_turn。
+        # 这不是严格证明，只是为了让搜索能在小环境里跑得动。
+        if should_prune_early_end_turn(current):
+            actions = [a for a in actions if a != END_TURN]
+
+        for action in actions:
+            child = copy(current)
+            _, _, _, _, info = child.step(action)
+
+            # 关键修正：每一步损失都加到当前路径上。
+            child_hp_loss = hp_loss + info["hp_loss"]
+            child_trajectory = trajectory + [action_label(current, action)]
+
+            if action == END_TURN or child.done:
+                outcomes.append((child_hp_loss, child, child_trajectory))
+            else:
+                stack.append((child, child_hp_loss, child_trajectory))
+
+    return rank_and_dedupe_turn_outcomes(outcomes)
+```
+
+作为一个可行的比较对象。理论最优或者接近最优算法。
+
+## 结果
+
+在初始混合的弱怪池下，很难接近搜索的结果。特别是部分有很高战损
+![图 3：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-03.png)
+
+![图 4：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-04.png)
+
+![图 5：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-05.png)
