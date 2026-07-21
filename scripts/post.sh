@@ -10,12 +10,14 @@ usage() {
 Usage:
   scripts/post.sh list
   scripts/post.sh new "文章标题" [专题目录]
+  scripts/post.sh assets
   scripts/post.sh build
   scripts/post.sh server
 
 Commands:
   list    List editable post source files under blog-source/source/_posts
   new     Create a new Hexo post source markdown. Example: scripts/post.sh new "文章标题" rl
+  assets  Normalize local post images into blog-source/source/img/posts
   build   Generate static site into blog-source/public
   server  Run local preview server (http://localhost:4000)
 USAGE
@@ -105,7 +107,11 @@ case "$cmd" in
       echo "Created: $post_file"
     fi
     ;;
+  assets)
+    node "$ROOT_DIR/scripts/normalize-post-assets.js"
+    ;;
   build)
+    node "$ROOT_DIR/scripts/normalize-post-assets.js"
     (cd "$BLOG_SRC" && npm run build)
     echo "Build complete: $BLOG_SRC/public"
     ;;

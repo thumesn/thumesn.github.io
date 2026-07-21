@@ -71,25 +71,32 @@ _posts/llm/
 _posts/site/
 ```
 
-图片统一放在：
+图片最终会统一放在：
 
 ```text
 img/posts/
 ```
 
-文章里用绝对路径引用图片：
+写文章时可以先把图片粘到当前文章目录，使用普通 Markdown 或 Obsidian 图片语法：
 
 ```md
-![图片说明](/img/posts/example.png)
+![图片说明](example.png)
+![[example.png]]
 ```
 
-不要使用 Obsidian 默认的 wikilink 图片格式：
+构建或发布时脚本会自动把图片移到 `img/posts/专题目录/`，并把文章里的引用改成站点绝对路径，例如：
 
 ```md
-![[Pasted image.png]]
+![图片说明](/img/posts/rl/example.png)
 ```
 
-也尽量不要用相对路径引用图片。Hexo 生成后文章 URL 会变成 `/2026/07/21/.../`，相对路径容易失效。
+也可以手动整理图片，命令是：
+
+```bash
+scripts/post.sh assets
+```
+
+已经是 `/img/...` 或 `https://...` 的图片链接不会被脚本改动。
 
 ## 一键提交并发布
 
