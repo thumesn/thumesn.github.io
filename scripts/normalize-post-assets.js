@@ -246,6 +246,21 @@ function figureAlt(title, imageIndex) {
   return `图 ${imageIndex}：${title}`;
 }
 
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function figureHtml(alt, url) {
+  const escapedAlt = escapeHtml(alt);
+  const escapedUrl = escapeHtml(url);
+  return `<figure class="post-figure">\n  <img src="${escapedUrl}" alt="${escapedAlt}">\n  <figcaption>${escapedAlt}</figcaption>\n</figure>`;
+}
+
 function normalizePost(postFile) {
   const original = fs.readFileSync(postFile, 'utf8');
   const lines = original.split(/(\r?\n)/);
@@ -271,7 +286,7 @@ function normalizePost(postFile) {
       changed = true;
       const providedAlt = (altPart || '').trim();
       const alt = isWeakAlt(providedAlt, ref) ? figureAlt(title, imageIndex) : providedAlt;
-      return `![${alt}](${nextUrl})`;
+      return figureHtml(alt, nextUrl);
     });
 
     line = line.replace(/!\[([^\]\n]*)\]\(([^)\n]+)\)/g, (match, alt, ref) => {
@@ -280,7 +295,7 @@ function normalizePost(postFile) {
       if (!nextUrl) return match;
       changed = true;
       const nextAlt = isWeakAlt(alt, ref) ? figureAlt(title, imageIndex) : alt.trim();
-      return `![${nextAlt}](${nextUrl})`;
+      return figureHtml(nextAlt, nextUrl);
     });
 
     line = line.replace(/(?<!!)\[([^\]\n]+)\]\(([^)\n]+\.md(?:#[^)\n]+)?)\)/g, (match, text, ref) => {

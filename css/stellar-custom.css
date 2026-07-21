@@ -288,6 +288,29 @@ body {
   color: var(--site-accent);
 }
 
+.l_body[layout="post"] article.md-text.content > figure.post-figure {
+  margin-top: 1.4rem;
+  margin-bottom: 1.6rem;
+}
+
+.l_body[layout="post"] article.md-text.content > figure.post-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid var(--site-rule);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.l_body[layout="post"] article.md-text.content > figure.post-figure figcaption {
+  margin-top: 0.55rem;
+  color: var(--site-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
 :root[data-theme="dark"] {
   --site-bg-grid: rgba(226, 232, 240, 0.035);
   --site-ink: rgba(255, 255, 255, 0.92);

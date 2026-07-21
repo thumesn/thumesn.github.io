@@ -92,12 +92,16 @@ img/posts/
 1. 把图片移到 `img/posts/专题目录/`
 2. 把文件名改成 `文章文件名-fig-编号.ext`
 3. 把文章里的引用改成站点绝对路径
-4. 如果图名是空、`alt text`、截图默认名或 Obsidian 默认名，就自动改成 `图 N：文章标题`
+4. 把图片转成带标题的 `<figure>`，标题会显示在页面图片下方
+5. 如果图名是空、`alt text`、截图默认名或 Obsidian 默认名，就自动改成 `图 N：文章标题`
 
 例如：
 
-```md
-![图 1：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01.png)
+```html
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01.png" alt="图 1：RL 解决杀戮尖塔（一）">
+  <figcaption>图 1：RL 解决杀戮尖塔（一）</figcaption>
+</figure>
 ```
 
 如果你已经手写了有意义的图名，比如 `![速度对比](example.png)`，脚本会保留这个图名，只整理文件路径。

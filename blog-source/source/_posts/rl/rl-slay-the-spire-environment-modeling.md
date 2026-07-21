@@ -1,6 +1,6 @@
 ---
 layout: post
-title: RL 解决杀戮尖塔（一）
+title: RL 解决杀戮尖塔（一）：大致回忆研究过程
 date: 2026-07-20 20:18:00
 tags:
   - Reinforcement Learning
@@ -20,7 +20,10 @@ categories:
 第一步先找一个合理的强化学习环境，这里就选择上网找了一个一般用于杀戮尖塔的环境https://github.com/zhiyue/sts2-rl-agent
 
 但是存在的问题是，环境的做法是直接对照效果写的，会有很多隐藏问题，包括版本不够新。于是选择用dll 反编译+和原始环境对照，重点是对照随机数的设计等部分。这里首先只对齐了 seed 0 -100 选择随机合理的选项。很多分歧，修复到目前为止，没有必要完全实现 相同的环境，目的能够达到就可以。速度方面，和游戏dll 通信大致时间为
-![图 1：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01.png)
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01.png" alt="图 1：RL 解决杀戮尖塔（一）">
+  <figcaption>图 1：RL 解决杀戮尖塔（一）</figcaption>
+</figure>
 
 一开始的想法大概是直接利用生成的反编译C# 但是发现C#本身速度也很慢，于是还是选择 dll 对照+python 环境后续训练中会避免太复杂的困难的问题。然后直接使用默认的编码+PPO 开始训练。
 
@@ -109,7 +112,10 @@ categories:
 ```
 或者采用 attention 添加几个编码器，或者分层强化学习等结论：
 
-![图 2：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-02.png)
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-02.png" alt="图 2：RL 解决杀戮尖塔（一）">
+  <figcaption>图 2：RL 解决杀戮尖塔（一）</figcaption>
+</figure>
 
 相比于搜索算法平均只有3左右的战损（弱怪初始卡） rl 无论怎么训练都是4左右 而且分布不合理，详细分析轨迹，甚至学不会 bash-> strike 
 
@@ -479,8 +485,21 @@ def enumerate_turn_outcomes(env, base_hp_loss, base_trajectory):
 ## 结果
 
 在初始混合的弱怪池下，很难接近搜索的结果。特别是部分有很高战损
-![图 3：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-03.png)
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-03.png" alt="图 3：测试结果">
+  <figcaption>图 3：测试结果</figcaption>
+</figure>
 
-![图 4：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-04.png)
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-04.png" alt="图 4：测试战损分布">
+  <figcaption>图 4：测试战损分布</figcaption>
+</figure>
 
-![图 5：RL 解决杀戮尖塔（一）](/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-05.png)
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-05.png" alt="图 5：训练reward 函数">
+  <figcaption>图 5：训练reward 函数</figcaption>
+</figure>
+
+这里是东西做完的补充，所以会有点简略。
+
+
