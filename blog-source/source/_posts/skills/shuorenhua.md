@@ -349,3 +349,164 @@ docs 场景里的术语、条件、顺序、命令、配置
 boundary-cases.md  演示什么时候不应该改掉字面命中了，不等于一定要改
 examples.md 具体的例子
 positive-style.md 文本拉回当前场景里“像具体人在说这件事”的状态。
+evals 防止规则越加越多以后，模型变得乱删。
+ automations  更新新的口癖 奇怪的口癖 人工从社区获取
+
+## log 启发
+
+  它不是单纯记“加了哪些词”。它记录的是这个 skill 从一个去 AI 味规则包，逐步变成一个有分发、有评测、有维护闭环的项目。
+
+  大概分 5 个阶段。
+
+  1. 早期：先把 skill 做出来
+
+  1.0.0 → 1.3.0
+
+  重点是：
+
+  建立 SKILL.md
+  建立中英文词表
+  建立基础规则
+  项目改名为 shuorenhua / 说人话
+
+  这阶段主要是在回答：
+
+  > 这个 skill 是什么？能不能基本工作？
+
+  2. 规则开始变严：防误杀和评测
+
+  1.4.0 → 1.6.0
+
+  重点是：
+
+  新增 benchmark
+  区分 Should Fix / Should Not Fix
+  补 annotation mode
+  补无源引用处理
+  补 code-context 边界
+
+  这说明作者发现了一个问题：
+
+  > 去 AI 味不能只追求删得多，还要避免误伤技术文档、代码上下文、引用和术语。
+
+  所以从这时开始，项目重心从“能改”变成“该改才改”。
+
+  3. 质量体系成型：protected spans、positive style、二次回读
+
+  1.7.0 → 1.7.4
+
+  重点是：
+
+  positive-style.md
+  protected-spans.md
+  Residual Audit / Two-pass
+  real-samples.md
+  community intake 接住体
+  guardrails
+
+  这阶段很关键。
+
+  它开始处理更细的问题：
+
+  删完套话后还是像 AI 怎么办？
+  哪些内容必须先保护？
+  改完后如何二次检查？
+  社区新口癖怎么归类？
+
+  这就是我们前面讲的核心流程开始成型。
+
+  4. 长文问题：scope 轴出现
+
+  1.8.5 → 1.8.7
+
+  这是 changelog 里很重要的一段。
+
+  起因是 issue #4：长文去 AI 味后明显缩水。
+
+  作者的判断是：
+
+  > 问题不在 minimal / standard / aggressive 三档力度，而在 structural 改写会删句、并句、重排。
+
+  所以先加了：
+
+  in-place scope
+
+  后来发现 in-place 虽然保长度，但整句空话删不掉，于是又加：
+
+  bounded scope
+
+  这就是现在三档 scope 的来源：
+
+  structural
+  bounded
+  in-place
+
+  这段说明这个 skill 是怎么通过真实 bad case 改流程的。不是拍脑袋加规则。
+
+  5. 维护和评测工程化
+
+  1.8.2 → 1.9.2
+
+  这里有两条线。
+
+  第一条是 intake automation：
+
+  automation/intake.md
+  automation/intake-prompt.md
+  automation/README.md
+
+  作用是处理社区新口癖：
+
+  已覆盖
+  变体归并
+  候选新模式
+
+  第二条是 eval harness：
+
+  automation/eval/
+  evals/results-v*.md
+  benchmark-blind.md
+  benchmark-map.md
+
+  作用是让评测更像真实考试，避免模型直接看到答案。
+
+  1.9.0 是一个节点：开始双模型实跑评测。
+
+  Codex 改写，Claude 判
+  Claude 改写，Codex 判
+
+  这说明作者开始把这个 skill 当成一个可测试系统维护，而不只是 prompt 文件。
+
+  6. 最新版本：分发和插件化
+
+  2.0.0
+
+  重点不是规则能力，而是安装分发：
+
+  Claude Code plugin
+  plugin.json
+  marketplace.json
+  README 英文段
+  安装文档更新
+  盲测口径修订
+
+  也就是说 2.0.0 主要解决：
+
+  > 怎么让别人更容易安装和使用？
+
+  不是大幅改“去 AI 味”的核心规则。
+
+  怎么看这个 changelog
+
+  你可以这样读：
+
+  想看规则怎么变强：看 1.4.0 - 1.7.4
+  想看长文 scope 怎么来的：看 1.8.5 - 1.8.7
+  想看自动维护：看 1.8.2 - 1.8.3
+  想看评测体系：看 1.9.0 - 1.9.2
+  想看安装分发：看 2.0.0
+
+  一句话概括：
+
+  > 这个 changelog 记录的是一个 prompt skill 从“规则文件”升级成“可安装、可评测、可维护、可迭代的文本编辑系统”的过程。
+
