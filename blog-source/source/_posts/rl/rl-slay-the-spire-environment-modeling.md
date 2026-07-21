@@ -1,6 +1,6 @@
 ---
 layout: post
-title: RL 解决杀戮尖塔（一）：环境建模从状态、动作和奖励开始
+title: RL 解决杀戮尖塔（一）
 date: 2026-07-20 20:18:00
 tags:
   - Reinforcement Learning
