@@ -126,8 +126,18 @@
     <link href="https://thumesn.github.io/2026/07/20/rl-slay-the-spire-series/"/>
     <id>https://thumesn.github.io/2026/07/20/rl-slay-the-spire-series/</id>
     <published>2026-07-20T12:16:21.000Z</published>
-    <updated>2026-07-21T14:18:03.571Z</updated>
+    <updated>2026-07-21T14:41:00.163Z</updated>
     
+    <content type="html"><![CDATA[<h2 id="环境问题考虑"><a href="#环境问题考虑" class="headerlink" title="环境问题考虑"></a>环境问题考虑</h2><p>现在的环境observation 肯定是不够的，对于排队和弃牌堆没有刻画；同时对于怪物的ai，严格来说也应该会有一个大致记忆；对于特殊效果考虑编码。</p><p>问题就是序列过大导致状态空间有点过大了，纯探索的话，难以探索到最优轨迹，也难以收敛到最优轨迹。</p><h3 id="状态空间"><a href="#状态空间" class="headerlink" title="状态空间"></a>状态空间</h3>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;环境问题考虑&quot;&gt;&lt;a href=&quot;#环境问题考虑&quot; class=&quot;headerlink&quot; title=&quot;环境问题考虑&quot;&gt;&lt;/a&gt;环境问题考虑&lt;/h2&gt;&lt;p&gt;现在的环境observation</summary>
+        
+      
     
     
     
