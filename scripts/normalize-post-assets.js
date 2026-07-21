@@ -62,6 +62,18 @@ function postTitle(postFile) {
   return match ? match[1].trim().replace(/^['"]|['"]$/g, '') : path.basename(postFile, path.extname(postFile));
 }
 
+function postDateParts(postFile) {
+  const content = fs.readFileSync(postFile, 'utf8');
+  const match = content.match(/^date:\s*(\d{4})-(\d{2})-(\d{2})/m);
+  return match ? [match[1], match[2], match[3]] : null;
+}
+
+function publicUrlForPost(postFile) {
+  const dateParts = postDateParts(postFile);
+  if (!dateParts) return null;
+  return `/${dateParts.join('/')}/${encodeURI(path.basename(postFile, path.extname(postFile)))}/`;
+}
+
 function figAssetName(postFile, fallbackName, index) {
   const ext = path.extname(fallbackName).toLowerCase();
   return `${postSlug(postFile)}-fig-${String(index).padStart(2, '0')}${ext}`;
@@ -175,6 +187,48 @@ function resolveAndMoveAsset(postFile, ref, imageIndex) {
   return null;
 }
 
+function normalizeMarkdownLink(postFile, ref) {
+  let rawRef = ref.trim();
+  if (rawRef.startsWith('<') && rawRef.endsWith('>')) {
+    rawRef = rawRef.slice(1, -1).trim();
+  }
+
+  const hashIndex = rawRef.indexOf('#');
+  const hash = hashIndex >= 0 ? rawRef.slice(hashIndex) : '';
+  const pathPart = safeDecode((hashIndex >= 0 ? rawRef.slice(0, hashIndex) : rawRef).split(/[?#]/)[0]);
+
+  if (!pathPart || isRemoteOrAbsolute(pathPart) || path.extname(pathPart).toLowerCase() !== '.md') {
+    return null;
+  }
+
+  const target = path.resolve(path.dirname(postFile), pathPart);
+  if (!target.startsWith(postDir + path.sep) || !fs.existsSync(target)) {
+    return null;
+  }
+
+  const url = publicUrlForPost(target);
+  if (!url) return null;
+  return {
+    url: `${url}${hash}`,
+    title: postTitle(target),
+  };
+}
+
+function findPostByWikiRef(postFile, ref) {
+  const normalizedRef = safeDecode(ref.trim());
+  if (!normalizedRef || normalizedRef.includes('/') || normalizedRef.includes('\\')) {
+    return null;
+  }
+
+  const basename = normalizedRef.endsWith('.md') ? normalizedRef.slice(0, -3) : normalizedRef;
+  const candidates = walk(postDir).filter((file) => path.extname(file).toLowerCase() === '.md'
+    && path.basename(file, '.md') === basename);
+  if (candidates.length === 1) return candidates[0];
+
+  const sibling = path.join(path.dirname(postFile), `${basename}.md`);
+  return fs.existsSync(sibling) ? sibling : null;
+}
+
 function isWeakAlt(alt, ref) {
   const value = alt.trim();
   if (!value) return true;
@@ -227,6 +281,23 @@ function normalizePost(postFile) {
       changed = true;
       const nextAlt = isWeakAlt(alt, ref) ? figureAlt(title, imageIndex) : alt.trim();
       return `![${nextAlt}](${nextUrl})`;
+    });
+
+    line = line.replace(/(?<!!)\[([^\]\n]+)\]\(([^)\n]+\.md(?:#[^)\n]+)?)\)/g, (match, text, ref) => {
+      const link = normalizeMarkdownLink(postFile, ref);
+      if (!link) return match;
+      changed = true;
+      return `[${link.title}](${link.url})`;
+    });
+
+    line = line.replace(/(?<!!)\[\[([^\]\n]+)\]\]/g, (match, inner) => {
+      const [refPart, textPart] = inner.split('|');
+      const target = findPostByWikiRef(postFile, refPart.trim());
+      if (!target) return match;
+      const nextUrl = publicUrlForPost(target);
+      if (!nextUrl) return match;
+      changed = true;
+      return `[${postTitle(target)}](${nextUrl})`;
     });
 
     lines[i] = line;

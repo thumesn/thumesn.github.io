@@ -110,6 +110,31 @@ scripts/post.sh assets
 
 已经是 `/img/...` 或 `https://...` 的图片链接不会被脚本改动。
 
+## 插入站内链接
+
+写作时可以直接用编辑器拖拽出来的 Markdown 链接：
+
+```md
+[text](../rl/rl-slay-the-spire-series.md)
+```
+
+构建或发布时会自动改成博客线上可用的站内链接，并把链接文字改成目标文章标题：
+
+```md
+[RL 解决杀戮尖塔专题：从规则环境到可训练 Agent](/2026/07/20/rl-slay-the-spire-series/)
+```
+
+Obsidian 的普通内部链接也会自动转换：
+
+```md
+[[rl-slay-the-spire-series]]
+[[rl-slay-the-spire-series|专题总览]]
+```
+
+这两种也都会使用目标文章标题作为显示文字。
+
+已经是 `https://...` 或 `/2026/...` 的链接不会被脚本改动。
+
 ## 一键提交并发布
 
 写完后运行：
