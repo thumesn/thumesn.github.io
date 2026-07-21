@@ -29,7 +29,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://thumesn.github.io/img/avatar.jpg">
 <meta property="article:published_time" content="2026-07-21T08:50:00.000Z">
-<meta property="article:modified_time" content="2026-07-21T09:13:44.896Z">
+<meta property="article:modified_time" content="2026-07-21T09:13:51.696Z">
 <meta property="article:author" content="thumesn">
 <meta property="article:tag" content="Skills">
 <meta property="article:tag" content="学习方法">
@@ -59,7 +59,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg"},"dateCreated":"2026-07-21T16:50:00+08:00","dateModified":"2026-07-21T17:13:44+08:00","datePublished":"2026-07-21T16:50:00+08:00","description":"","headline":"说人话: 远离ai味","mainEntityOfPage":{"@type":"WebPage","@id":"https://thumesn.github.io/2026/07/21/shuorenhua/"},"publisher":{"@type":"Organization","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg","logo":{"@type":"ImageObject","url":"/img/avatar.jpg"}},"url":"https://thumesn.github.io/2026/07/21/shuorenhua/","keywords":"Skills, 学习方法, 问题解决","image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg"},"dateCreated":"2026-07-21T16:50:00+08:00","dateModified":"2026-07-21T17:13:51+08:00","datePublished":"2026-07-21T16:50:00+08:00","description":"","headline":"说人话: 远离ai味","mainEntityOfPage":{"@type":"WebPage","@id":"https://thumesn.github.io/2026/07/21/shuorenhua/"},"publisher":{"@type":"Organization","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg","logo":{"@type":"ImageObject","url":"/img/avatar.jpg"}},"url":"https://thumesn.github.io/2026/07/21/shuorenhua/","keywords":"Skills, 学习方法, 问题解决","image":[]}</script>
   <link rel="stylesheet" href="/css/stellar-custom.css">
 </head>
 <body>
@@ -91,7 +91,7 @@
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/Skills/">Skills</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-07-21T08:50:00.000Z">2026-07-21</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-07-21T09:13:44.896Z">2026-07-21</time></span></div></div></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-07-21T08:50:00.000Z">2026-07-21</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-07-21T09:13:51.696Z">2026-07-21</time></span></div></div></div>
     
     <div class="bottom only-title">
       
@@ -120,7 +120,7 @@
 </ul>
 <h2 id="判断场景"><a href="#判断场景" class="headerlink" title="判断场景"></a>判断场景</h2><p>chat：聊天、评论、即时回复<br>status：进度同步、站会、汇报、复盘摘要<br>docs：技术文档、说明、FAQ、事故复盘<br>public-writing：公众号、帖子、对外文章</p>
 <p>基本是让模型判断，给了模型一些场景信号</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">先判主场景，再处理局部问题。混合文本只保留一个主语域，其他语域只在必要信息层面留下<br>如果文本本身命中下面任一子场景，不依赖用户是否明说，也不受主场景初判限制，都要补看 Scene Packs：<br><br>  - `README`：出现项目介绍、快速开始、安装方式、功能列表、README intro 等信号时，第一屏要说清“这是什么、给谁用、解决什么问题”<br>  - `release-note`：出现版本标题、`Release Highlights`、`Added / Changed / Fixed / Tested`、changelog 列表等信号时，列清本版变更、验证和<br>  限制，不写发布宣言<br>  - `forum-post`：出现 Linux.do / V2EX / 社区帖 / 发帖复盘等信号时，保留维护者的真实观察和社区语气，不改成公告<br>  - `issue-reply`：出现 issue / PR 回复、bad case、复现、下一版补 benchmark 等信号时，先确认问题和下一步，不做客服式安抚<br><br>  子场景只负责发布目的和语气收束，不覆盖 protected spans、Tier、档位和回读规则。完整策略见 [Scene Packs](./references/scene-packs.md)。<br><br>  还有一个“混合场景处理”的原文：<br><br>  ### 混合场景处理<br><br>  如果一段文本同时命中多个场景：<br><br>  1. 先判主要用途<br>  2. 先划 protected spans，再以主场景的禁改项为上限<br>  3. 只清理次场景里明显突兀的词，不追求绝对纯化<br></code></pre></td></tr></table></figure></article>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python">先判主场景，再处理局部问题。混合文本只保留一个主语域，其他语域只在必要信息层面留下<br>如果文本本身命中下面任一子场景，不依赖用户是否明说，也不受主场景初判限制，都要补看 Scene Packs：<br><br>  - `README`：出现项目介绍、快速开始、安装方式、功能列表、README intro 等信号时，第一屏要说清“这是什么、给谁用、解决什么问题”<br>  - `release-note`：出现版本标题、`Release Highlights`、`Added / Changed / Fixed / Tested`、changelog 列表等信号时，列清本版变更、验证和<br>  限制，不写发布宣言<br>  - `forum-post`：出现 Linux.do / V2EX / 社区帖 / 发帖复盘等信号时，保留维护者的真实观察和社区语气，不改成公告<br>  - `issue-reply`：出现 issue / PR 回复、bad <span class="hljs-keyword">case</span>、复现、下一版补 benchmark 等信号时，先确认问题和下一步，不做客服式安抚<br><br>  子场景只负责发布目的和语气收束，不覆盖 protected spans、Tier、档位和回读规则。完整策略见 [Scene Packs](./references/scene-packs.md)。<br><br>  还有一个“混合场景处理”的原文：<br><br>  <span class="hljs-comment">### 混合场景处理</span><br><br>  如果一段文本同时命中多个场景：<br><br>  <span class="hljs-number">1.</span> 先判主要用途<br>  <span class="hljs-number">2.</span> 先划 protected spans，再以主场景的禁改项为上限<br>  <span class="hljs-number">3.</span> 只清理次场景里明显突兀的词，不追求绝对纯化<br></code></pre></td></tr></table></figure></article>
 <div class="article-footer">
     <section id="license">
       <div class="header"><span>许可协议</span></div>
@@ -131,7 +131,7 @@
 
 </div>
 
-<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/2026/07/21/skills-problem-solving-and-learning/">Skills 解读</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/07/20/rl-slay-the-spire-environment-modeling/">RL 解决杀戮尖塔（一）</a></div></section></div>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/07/21/skills-problem-solving-and-learning/">Skills 解读</a></div></section></div>
 
 
 
