@@ -17,6 +17,7 @@ blog-source/source/_posts/
 ```text
 blog-source/source/_posts/llm/
 blog-source/source/_posts/rl/
+blog-source/source/_posts/skills/
 blog-source/source/_posts/site/
 ```
 
@@ -33,6 +34,7 @@ scripts/post.sh new "文章标题"
 ```bash
 scripts/post.sh new "文章标题" rl
 scripts/post.sh new "文章标题" llm
+scripts/post.sh new "文章标题" skills
 ```
 
 查看所有文章：
@@ -68,6 +70,7 @@ scripts/post.sh server
 ```text
 _posts/rl/
 _posts/llm/
+_posts/skills/
 _posts/site/
 ```
 

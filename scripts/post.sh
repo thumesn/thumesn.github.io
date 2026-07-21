@@ -27,6 +27,7 @@ topic_category() {
   case "$1" in
     llm) echo "LLM" ;;
     rl) echo "强化学习" ;;
+    skills) echo "Skills" ;;
     site) echo "站点" ;;
     *) echo "$1" ;;
   esac

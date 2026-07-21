@@ -6,7 +6,7 @@
   <link href="https://thumesn.github.io/atom.xml" rel="self"/>
   
   <link href="https://thumesn.github.io/"/>
-  <updated>2026-07-21T08:34:34.522Z</updated>
+  <updated>2026-07-21T08:41:21.211Z</updated>
   <id>https://thumesn.github.io/</id>
   
   <author>
@@ -15,6 +15,40 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Skills：把解决问题和学习流程写下来</title>
+    <link href="https://thumesn.github.io/2026/07/21/skills-problem-solving-and-learning/"/>
+    <id>https://thumesn.github.io/2026/07/21/skills-problem-solving-and-learning/</id>
+    <published>2026-07-21T08:50:00.000Z</published>
+    <updated>2026-07-21T08:41:21.211Z</updated>
+    
+    <content type="html"><![CDATA[<p>这个专题用来记录我怎么把一个问题拆开、怎么查资料、怎么做实验，以及最后沉淀成可复用的 skill。</p><p>我现在越来越觉得，很多事情不是“会不会”的问题，而是有没有一套能重复执行的流程。一次折腾解决了，不等于下次还记得。写成 skill 的意义，就是把当时真正有效的步骤留下来。</p><h2 id="我会记录什么"><a href="#我会记录什么" class="headerlink" title="我会记录什么"></a>我会记录什么</h2><p>这个专题主要写三类内容：</p><ol><li>问题是怎么定位的</li><li>解决过程里哪些步骤真的有用</li><li>下次遇到类似问题，怎么少走弯路</li></ol><p>它不会写成很正式的教程。更像是工作记录：先说问题，再说尝试，再说最后保留下来的方法。</p><h2 id="一篇记录的基本结构"><a href="#一篇记录的基本结构" class="headerlink" title="一篇记录的基本结构"></a>一篇记录的基本结构</h2><p>以后这类文章可以按这个结构写：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs text">问题：我到底卡在哪里<br>场景：这个问题发生在什么上下文<br>尝试：试过哪些办法，哪些没用<br>有效步骤：最后真正起作用的流程<br>可复用规则：下次可以直接照做的部分<br>后续：还有什么没解决<br></code></pre></td></tr></table></figure><p>这个结构的重点不是好看，而是方便复用。尤其是“哪些没用”也要写，因为很多时间其实浪费在重复踩同一个坑上。</p><h2 id="和博客的关系"><a href="#和博客的关系" class="headerlink" title="和博客的关系"></a>和博客的关系</h2><p>普通技术文章写结果，skills 文章更关注过程。</p><p>比如强化学习文章会写环境、reward、baseline；skills 文章会写“我是怎么排查环境不一致的”“怎么设计一个能复用的实验记录流程”。</p><p>一个偏知识，一个偏方法。两者可以互相链接。</p><h2 id="先从小问题开始"><a href="#先从小问题开始" class="headerlink" title="先从小问题开始"></a>先从小问题开始</h2><p>这个专题不需要一开始就写很大的方法论。更适合从小问题开始：</p><ul><li>Obsidian 插图怎么自动适配 Hexo</li><li>博客自动发布怎么避免频繁提交</li><li>论文阅读怎么沉淀成可复用提纲</li><li>强化学习实验怎么记录参数和结果</li></ul><p>每解决一个具体问题，就补一篇。慢慢积累下来，它会变成自己的工作手册。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;这个专题用来记录我怎么把一个问题拆开、怎么查资料、怎么做实验，以及最后沉淀成可复用的 skill。&lt;/p&gt;
+&lt;p&gt;我现在越来越觉得，很多事情不是“会不会”的问题，而是有没有一套能重复执行的流程。一次折腾解决了，不等于下次还记得。写成 skill</summary>
+        
+      
+    
+    
+    
+    <category term="技术" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    <category term="Skills" scheme="https://thumesn.github.io/categories/%E6%8A%80%E6%9C%AF/Skills/"/>
+    
+    
+    <category term="Skills" scheme="https://thumesn.github.io/tags/Skills/"/>
+    
+    <category term="学习方法" scheme="https://thumesn.github.io/tags/%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"/>
+    
+    <category term="问题解决" scheme="https://thumesn.github.io/tags/%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"/>
+    
+  </entry>
   
   <entry>
     <title>RL 解决杀戮尖塔（一）</title>
