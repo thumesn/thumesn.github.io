@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const rootDir = path.resolve(__dirname, '..');
 const postDir = path.join(rootDir, 'blog-source', 'source', '_posts');
@@ -31,6 +32,29 @@ function safeDecode(value) {
 
 function hasImageExt(value) {
   return imageExts.has(path.extname(value.split(/[?#]/)[0]).toLowerCase());
+}
+
+function shortHash(value) {
+  return crypto.createHash('sha1').update(value).digest('hex').slice(0, 8);
+}
+
+function safeAssetName(sourceFile, fallbackName) {
+  const ext = path.extname(fallbackName).toLowerCase();
+  const rawBase = path.basename(fallbackName, path.extname(fallbackName));
+  const base = rawBase
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+
+  if (base) return `${base}${ext}`;
+
+  const hashSource = fs.existsSync(sourceFile)
+    ? fs.readFileSync(sourceFile)
+    : Buffer.from(fallbackName);
+  return `image-${shortHash(hashSource)}${ext}`;
 }
 
 function isRemoteOrAbsolute(ref) {
@@ -80,9 +104,9 @@ function resolveAndMoveAsset(postFile, ref) {
   }
 
   const postAssetDir = assetDirForPost(postFile);
-  const filename = path.basename(cleanRef);
-  const targetCandidate = path.join(postAssetDir, filename);
   const sourceCandidate = path.resolve(path.dirname(postFile), cleanRef);
+  const filename = safeAssetName(sourceCandidate, path.basename(cleanRef));
+  const targetCandidate = path.join(postAssetDir, filename);
 
   if (!sourceCandidate.startsWith(postDir + path.sep) && sourceCandidate !== targetCandidate) {
     return null;
