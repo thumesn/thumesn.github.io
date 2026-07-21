@@ -509,3 +509,14 @@ def enumerate_turn_outcomes(env, base_hp_loss, base_trajectory):
   <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01-1.png" alt="图 1：RL 解决杀戮尖塔（一）：大致回忆研究过程">
   <figcaption>图 1：RL 解决杀戮尖塔（一）：大致回忆研究过程</figcaption>
 </figure>
+
+### 泛化结果
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01-2.png" alt="基本无法泛化">
+  <figcaption>基本无法泛化</figcaption>
+</figure>
+
+问题主要是三个
+1. 为什么要进行反事实，反事实为什么会更好
+2. 如何处理更加复杂的情况，反事实在困难的事件上很难的
+3. 战斗本身也要有一定的泛化

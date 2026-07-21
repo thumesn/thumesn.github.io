@@ -29,7 +29,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://thumesn.github.io/img/avatar.jpg">
 <meta property="article:published_time" content="2026-07-20T12:18:00.000Z">
-<meta property="article:modified_time" content="2026-07-21T13:43:55.970Z">
+<meta property="article:modified_time" content="2026-07-21T13:54:05.624Z">
 <meta property="article:author" content="thumesn">
 <meta property="article:tag" content="Reinforcement Learning">
 <meta property="article:tag" content="RL">
@@ -60,7 +60,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg"},"dateCreated":"2026-07-20T20:18:00+08:00","dateModified":"2026-07-21T21:43:55+08:00","datePublished":"2026-07-20T20:18:00+08:00","description":"","headline":"RL 解决杀戮尖塔（一）：大致回忆研究过程","mainEntityOfPage":{"@type":"WebPage","@id":"https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/"},"publisher":{"@type":"Organization","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg","logo":{"@type":"ImageObject","url":"/img/avatar.jpg"}},"url":"https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/","keywords":"Reinforcement Learning, RL, Slay the Spire, Game AI","image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg"},"dateCreated":"2026-07-20T20:18:00+08:00","dateModified":"2026-07-21T21:54:05+08:00","datePublished":"2026-07-20T20:18:00+08:00","description":"","headline":"RL 解决杀戮尖塔（一）：大致回忆研究过程","mainEntityOfPage":{"@type":"WebPage","@id":"https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/"},"publisher":{"@type":"Organization","name":"thumesn","sameAs":[],"image":"/img/avatar.jpg","logo":{"@type":"ImageObject","url":"/img/avatar.jpg"}},"url":"https://thumesn.github.io/2026/07/20/rl-slay-the-spire-environment-modeling/","keywords":"Reinforcement Learning, RL, Slay the Spire, Game AI","image":[]}</script>
   <link rel="stylesheet" href="/css/stellar-custom.css">
 </head>
 <body>
@@ -92,7 +92,7 @@
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/">强化学习</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/%E6%9D%80%E6%88%AE%E5%B0%96%E5%A1%94/">杀戮尖塔</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-07-20T12:18:00.000Z">2026-07-20</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-07-21T13:43:55.970Z">2026-07-21</time></span></div></div></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-07-20T12:18:00.000Z">2026-07-20</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-07-21T13:54:05.624Z">2026-07-21</time></span></div></div></div>
     
     <div class="bottom only-title">
       
@@ -169,6 +169,18 @@
   <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01-1.png" alt="图 1：RL 解决杀戮尖塔（一）：大致回忆研究过程">
   <figcaption>图 1：RL 解决杀戮尖塔（一）：大致回忆研究过程</figcaption>
 </figure>
+
+<h3 id="泛化结果"><a href="#泛化结果" class="headerlink" title="泛化结果"></a>泛化结果</h3><figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-environment-modeling-fig-01-2.png" alt="基本无法泛化">
+  <figcaption>基本无法泛化</figcaption>
+</figure>
+
+<p>问题主要是三个</p>
+<ol>
+<li>为什么要进行反事实，反事实为什么会更好</li>
+<li>如何处理更加复杂的情况，反事实在困难的事件上很难的</li>
+<li>战斗本身也要有一定的泛化</li>
+</ol>
 </article>
 <div class="article-footer">
     <section id="license">
@@ -180,7 +192,7 @@
 
 </div>
 
-<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/2026/07/21/skills-problem-solving-and-learning/">Skills 解读</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/07/20/rl-slay-the-spire-series/">RL 解决杀戮尖塔专题：从规则环境到可训练 Agent</a></div></section></div>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/2026/07/21/shuorenhua/">说人话: 远离ai味</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/07/20/rl-slay-the-spire-series/">RL 解决杀戮尖塔专题：从规则环境到可训练 Agent</a></div></section></div>
 
 
 
@@ -192,7 +204,7 @@
 <div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
 <div class="widgets">
 
-<widget class="widget-wrapper toc" id="data-toc" collapse="auto"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%B7%E7%82%B9%EF%BC%9A%E7%8E%AF%E5%A2%83"><span class="toc-text">起点：环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E7%8E%AF%E8%8A%82%EF%BC%9A%E7%97%B4%E5%BF%83%E5%A6%84%E6%83%B3"><span class="toc-text">初始环节：痴心妄想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E9%80%89%E6%8B%A9"><span class="toc-text">算法选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="toc-text">结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%E5%AF%B9%E6%AF%94"><span class="toc-text">结果对比</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a></div></widget>
+<widget class="widget-wrapper toc" id="data-toc" collapse="auto"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%B7%E7%82%B9%EF%BC%9A%E7%8E%AF%E5%A2%83"><span class="toc-text">起点：环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E7%8E%AF%E8%8A%82%EF%BC%9A%E7%97%B4%E5%BF%83%E5%A6%84%E6%83%B3"><span class="toc-text">初始环节：痴心妄想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E9%80%89%E6%8B%A9"><span class="toc-text">算法选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="toc-text">结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%E5%AF%B9%E6%AF%94"><span class="toc-text">结果对比</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%9B%E5%8C%96%E7%BB%93%E6%9E%9C"><span class="toc-text">泛化结果</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a></div></widget>
 </div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
