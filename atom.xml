@@ -122,22 +122,12 @@
   </entry>
   
   <entry>
-    <title>RL 解决杀戮尖塔专题：从规则环境到可训练 Agent</title>
+    <title>RL 解决杀戮尖塔2：从环境开始重新考虑</title>
     <link href="https://thumesn.github.io/2026/07/20/rl-slay-the-spire-series/"/>
     <id>https://thumesn.github.io/2026/07/20/rl-slay-the-spire-series/</id>
     <published>2026-07-20T12:16:21.000Z</published>
-    <updated>2026-07-20T12:18:16.767Z</updated>
+    <updated>2026-07-21T14:18:03.571Z</updated>
     
-    <content type="html"><![CDATA[<p>这个专题记录一个长期实验：用强化学习去训练一个能玩《杀戮尖塔》的 agent。它不会从一开始就追求“通关”，而是先把问题拆小：环境怎么建模，动作空间怎么压缩，reward 怎么设计，baseline 怎么评估，再逐步推进到策略学习和搜索结合。</p><p>我更想把它写成一组可复盘的工程记录，而不是一篇一次性教程。强化学习项目最容易卡住的地方，往往不是 PPO、DQN 或 Actor-Critic 的公式，而是环境接口、状态表示、非法动作、随机性和评估方式。</p><h2 id="为什么选择杀戮尖塔"><a href="#为什么选择杀戮尖塔" class="headerlink" title="为什么选择杀戮尖塔"></a>为什么选择杀戮尖塔</h2><p>《杀戮尖塔》适合拿来做 RL 实验，因为它同时具备几个有意思的特征：</p><ol><li><strong>状态空间大</strong>：卡组、遗物、血量、敌人意图、药水、路线都会影响决策。</li><li><strong>动作有强约束</strong>：战斗中不是所有牌都能打，地图上不是所有路线都能走。</li><li><strong>长期收益明显</strong>：一张牌当前很强，不代表它适合后续卡组。</li><li><strong>随机性很强</strong>：抽牌、奖励、事件、敌人组合都会改变策略价值。</li></ol><p>这些特征让它比 CartPole 这类入门环境复杂很多，但又比完全开放世界更可控。对学习 RL 来说，它是一个足够折磨、也足够具体的中间项目。</p><h2 id="专题路线"><a href="#专题路线" class="headerlink" title="专题路线"></a>专题路线</h2><p>我准备按下面的顺序写：</p><h3 id="1-环境建模"><a href="#1-环境建模" class="headerlink" title="1. 环境建模"></a>1. 环境建模</h3><p>第一步是把游戏拆成 RL 能理解的问题：什么是 state，什么是 action，什么时候 episode 结束，以及哪些信息应该进入 observation。</p><ul><li>当前文章：<a href="/2026/07/20/rl-slay-the-spire-environment-modeling/">环境建模：先把游戏拆成状态、动作和奖励</a></li></ul><h3 id="2-动作空间压缩"><a href="#2-动作空间压缩" class="headerlink" title="2. 动作空间压缩"></a>2. 动作空间压缩</h3><p>原始动作空间会非常麻烦。战斗时可以出牌、选择目标、结束回合；奖励时可以选牌、跳过、拿遗物；地图时还要选路线。后续需要把这些动作统一成一个可管理的接口。</p><p>我会重点记录三件事：</p><ol><li>如何表达非法动作 mask</li><li>如何把组合动作拆成多步决策</li><li>如何避免 agent 学到“卡死流程”的行为</li></ol><h3 id="3-Reward-设计"><a href="#3-Reward-设计" class="headerlink" title="3. Reward 设计"></a>3. Reward 设计</h3><p>如果只在通关时给 reward，训练会非常稀疏。如果每一步都给太多 shaping reward，agent 又可能学到短视行为。这个专题会从最粗的胜负 reward 开始，再逐步加入血量、战斗损失、卡组质量等中间信号。</p><h3 id="4-Baseline-与评估"><a href="#4-Baseline-与评估" class="headerlink" title="4. Baseline 与评估"></a>4. Baseline 与评估</h3><p>在训练复杂 agent 前，需要先写一些简单 baseline：</p><ol><li>随机合法动作</li><li>简单启发式策略</li><li>固定选牌规则</li></ol><p>没有 baseline，训练曲线很容易自我感动。一个模型看起来 reward 上升，不代表它真的学会了游戏，也可能只是避开了某些会扣分的动作。</p><h3 id="5-策略学习"><a href="#5-策略学习" class="headerlink" title="5. 策略学习"></a>5. 策略学习</h3><p>等环境和评估稳定后，再考虑算法。初期我会优先试 PPO，因为它适合离散动作和复杂策略；后面再看能否加入 value-based 方法、模仿学习或搜索。</p><h3 id="6-搜索与规划"><a href="#6-搜索与规划" class="headerlink" title="6. 搜索与规划"></a>6. 搜索与规划</h3><p>杀戮尖塔的很多决策带有规划性质。比如当前战斗怎么打，路线怎么选，卡组未来怎么成型。纯 RL 可能不够稳，后续可以考虑把策略网络和搜索结合起来。</p><h2 id="这个专题会记录什么"><a href="#这个专题会记录什么" class="headerlink" title="这个专题会记录什么"></a>这个专题会记录什么</h2><p>我会重点记录可复现的东西：</p><ul><li>环境接口怎么设计</li><li>observation 和 action 怎么编码</li><li>reward 为什么这么设</li><li>训练曲线怎么看</li><li>哪些实验失败了</li><li>哪些 bug 会让模型学歪</li></ul><p>如果只写成功结果，这个专题就没有太大价值。RL 项目的真实经验通常藏在失败里：reward 设错、动作 mask 漏了、评估脚本不一致、训练随机种子导致结论反复变化。</p><h2 id="当前判断"><a href="#当前判断" class="headerlink" title="当前判断"></a>当前判断</h2><p>这个项目的核心难点不是“用哪个算法”，而是先把游戏变成一个稳定、可评估、可迭代的学习环境。算法可以换，但环境抽象一旦混乱，后续实验都会变成噪声。</p><p>所以第一阶段目标很明确：先做一个小而硬的环境接口，让 agent 能在受限场景里完成合法决策。等这个地基稳定，再谈完整爬塔。</p>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;这个专题记录一个长期实验：用强化学习去训练一个能玩《杀戮尖塔》的 agent。它不会从一开始就追求“通关”，而是先把问题拆小：环境怎么建模，动作空间怎么压缩，reward 怎么设计，baseline</summary>
-        
-      
     
     
     
