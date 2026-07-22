@@ -20,3 +20,14 @@ categories:
 问题就是序列过大导致状态空间有点过大了，纯探索的话，难以探索到最优轨迹，也难以收敛到最优轨迹。
 
 ### 状态空间
+  - player: 13 维，含绝对 HP、block、energy、powers、incoming enemy damage。
+      - hand: 10 张牌，每张 16 维，含类型、目标、exhaust/draw/vulnerable 等信息。
+      - piles_and_next_draw: 981 维，含 draw/discard/exhaust 三牌堆 size、tracked counts、ordered slots、next draw summary。
+      - enemies: 5 个敌人，每个 23 维，含 HP、block、buff/debuff、intent one-hot、intent damage/hits/block/strength/slimed/shrink 等效果
+
+
+## 直接进行训练  
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01.png" alt="训练结果">
+  <figcaption>训练结果</figcaption>
+</figure>
