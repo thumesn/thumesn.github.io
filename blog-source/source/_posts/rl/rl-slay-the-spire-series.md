@@ -35,4 +35,23 @@ categories:
 
 使用搜索 + qlearning 的方式进行，环境搜索各种情况
 
-## 
+## 动作空间新设计
+
+考虑到具体的效果，和泛化性质，决定使用encoder 编码后进一步训练。直接的训练效果如下
+
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01-1.png" alt="训练分布">
+  <figcaption>训练分布</figcaption>
+</figure>
+
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-02.png" alt="训练曲线">
+  <figcaption>训练曲线</figcaption>
+</figure>
+
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-03.png" alt="reward曲线">
+  <figcaption>reward曲线</figcaption>
+</figure>
+
+是不是encoder 编码不够好呢，进行校验任务
