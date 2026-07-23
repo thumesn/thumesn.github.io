@@ -54,4 +54,9 @@ categories:
   <figcaption>reward曲线</figcaption>
 </figure>
 
-是不是encoder 编码不够好呢，进行校验任务
+是不是encoder 编码不够好呢，进行校验任务冻结mlp检验
+
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01-2.png" alt="冻结检验">
+  <figcaption>冻结检验</figcaption>
+</figure>
