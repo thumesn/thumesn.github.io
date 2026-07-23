@@ -61,3 +61,10 @@ categories:
   <figcaption>冻结检验</figcaption>
 </figure>
 
+辅助纳入校验：无效
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01-3.png" alt="图 1：RL 解决杀戮尖塔2：从环境开始重新考虑">
+  <figcaption>图 1：RL 解决杀戮尖塔2：从环境开始重新考虑</figcaption>
+</figure>
+
+探索可能过少 从20k 改动50k
