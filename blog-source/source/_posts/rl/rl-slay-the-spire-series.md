@@ -31,3 +31,8 @@ categories:
   <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01.png" alt="训练结果">
   <figcaption>训练结果</figcaption>
 </figure>
+
+
+使用搜索 + qlearning 的方式进行，环境搜索各种情况
+
+## 
