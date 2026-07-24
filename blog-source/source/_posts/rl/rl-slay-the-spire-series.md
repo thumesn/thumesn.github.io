@@ -81,6 +81,14 @@ categories:
   记录真实掉血
 <figure class="post-figure">
   <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01-5.png" alt="图 1：RL 解决杀戮尖塔2：从环境开始重新考虑">
-  <figcaption>图 1：RL 解决杀戮尖塔2：从环境开始重新考虑</figcaption>
+  <figcaption>多一个辅助头结果</figcaption>
 </figure>
 还是和baseline 差别很大
+
+## 回放
+
+存在的问题其实是因为好的经验回放不够 最终采用了DQfD；加入标准的内容多次回放。
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01-6.png" alt="DQfD">
+  <figcaption>DQfD</figcaption>
+</figure>
