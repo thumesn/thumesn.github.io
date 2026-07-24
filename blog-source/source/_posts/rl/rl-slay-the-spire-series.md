@@ -72,3 +72,10 @@ categories:
   <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01-4.png" alt="reward曲线">
   <figcaption>reward曲线</figcaption>
 </figure>
+
+新增了 forced_end_hp_loss 辅助目标：
+
+  对每个 state + candidate_action：
+  先模拟执行 action
+  再强制 END_TURN
+  记录真实掉血
