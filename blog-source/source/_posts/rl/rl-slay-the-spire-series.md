@@ -67,4 +67,8 @@ categories:
   <figcaption>图 1：RL 解决杀戮尖塔2：从环境开始重新考虑</figcaption>
 </figure>
 
-探索可能过少 从20k 改动50k
+探索可能过少 从20k 改动50k，把 return 逐步改为整体结果,还是无法降低到 搜索的水平
+<figure class="post-figure">
+  <img src="/img/posts/rl/rl-slay-the-spire-series-fig-01-4.png" alt="reward曲线">
+  <figcaption>reward曲线</figcaption>
+</figure>
